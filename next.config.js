@@ -1,7 +1,4 @@
-﻿
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'standalone',
+﻿const nextConfig = {
   images: {
     unoptimized: true,
   },
@@ -10,15 +7,5 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  // For Turbopack with Tailwind v4
-  experimental: {
-    turbo: {
-      rules: {
-        '*.css': {
-          loaders: ['postcss'],
-        }
-      }
-    }
   }
 }
