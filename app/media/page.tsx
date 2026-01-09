@@ -183,7 +183,9 @@ export default function MediaPage() {
           {floatingImages.map((img, idx) => (
             <div
               key={idx}
-              ref={el => imageRefs.current[idx] = el}
+              ref={el => {
+                imageRefs.current[idx] = el;
+              }}
               className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
                 idx === currentImageIndex ? 'opacity-100' : 'opacity-0'
               }`}
@@ -487,4 +489,4 @@ function VideoCard({ item, setSelectedVideo }: any) {
       </div>
     </div>
   );
-}
+} 
