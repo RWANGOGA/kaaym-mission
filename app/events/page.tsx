@@ -111,7 +111,9 @@ export default function EventsPage() {
                   />
                 ) : (
                   <video
-                    ref={el => videoRefs.current[index] = el}
+                    ref={el => {
+                      videoRefs.current[index] = el;
+                    }}
                     className="h-full w-full object-cover"
                     loop
                     muted={isMuted}
