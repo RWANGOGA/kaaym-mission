@@ -6,13 +6,17 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { siteConfig } from './config/site';
 
-
 const inter = Inter({ subsets: ['latin'] });
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: {
     default: `${siteConfig.name} - ${siteConfig.description}`,
-    template: `%s | ${siteConfig.name}`
+    template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.mission,
   keywords: [
@@ -24,27 +28,23 @@ export const metadata: Metadata = {
     'Western Uganda',
     'Kampala',
     'Anglican Church',
-    'Youth Fellowship'
+    'Youth Fellowship',
   ],
   authors: [{ name: siteConfig.name }],
   openGraph: {
     type: 'website',
     locale: 'en_UG',
-    url: 'https://kaaym.org', // Replace with actual URL
+    url: 'https://kaaym.org',
     title: siteConfig.name,
     description: siteConfig.mission,
-    siteName: siteConfig.name
-  }
+    siteName: siteConfig.name,
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} flex flex-col min-h-screen`}>
+      <body className={`${inter.className} flex flex-col min-h-screen overflow-x-hidden`}>
         <Header />
         <main className="flex-grow">
           {children}
