@@ -42,7 +42,7 @@ export default function MediaPage() {
         title: 'Worship Sessions',
         description: 'Beautiful worship and praise moments',
         type: 'video',
-        youtubeId: getYouTubeId('https://www.youtube.com/watch?v=5578g8nWRvg'),
+        youtubeId: getYouTubeId('https://www.youtube.com/watch?v=Lrb6KUX-6_g'),
         thumbnail: 'https://img.youtube.com/vi/5578g8nWRvg/maxresdefault.jpg',
         date: '2024-10-15',
         duration: '35:40',

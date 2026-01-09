@@ -198,12 +198,12 @@ export default function EventsPage() {
             </div>
 
             {/* YouTube Link - Only Text on Page */}
-            <div className="mt-16 text-center">
+            <div className="mt-16 text-center z-50">
               <a 
                 href="https://www.youtube.com/@KAAYMMukChapter" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+                className="relative z-50 inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
               >
                 <Youtube className="w-4 h-4" />
                 <span>For more events visit our YouTube channel</span>
