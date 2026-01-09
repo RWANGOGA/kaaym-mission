@@ -1,0 +1,6 @@
+﻿# Ignore large video files in Vercel deployment
+public/videos/
+*.mp4
+*.mov
+*.avi
+*.mkv
