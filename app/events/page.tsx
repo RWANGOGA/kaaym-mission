@@ -1,7 +1,7 @@
 // app/events/page.tsx
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Youtube, Play, Volume2, VolumeX } from 'lucide-react';
 
 interface MediaItem {
@@ -14,8 +14,7 @@ export default function EventsPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
-  const [videosLoaded, setVideosLoaded] = useState(false);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const displayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // ALL MEDIA - Images and Videos
@@ -41,133 +40,76 @@ export default function EventsPage() {
     { id: 'i8', media: '/images/committe.jpg', mediaType: 'image' },
   ];
 
-  // Initialize all videos on mount
+  const currentItem = allMedia[currentSlide];
+
+  // Handle automatic slide progression
   useEffect(() => {
-    const initVideos = async () => {
-      for (let i = 0; i < videoRefs.current.length; i++) {
-        const video = videoRefs.current[i];
-        if (video && allMedia[i]?.mediaType === 'video') {
-          video.muted = true;
-          video.load();
-          try {
-            await video.play();
-            video.pause();
-            video.currentTime = 0;
-          } catch (e) {
-            console.log(`Failed to init video ${i}:`, e);
-          }
-        }
-      }
-      setVideosLoaded(true);
-    };
-
-    // Small delay to ensure DOM is ready
-    setTimeout(initVideos, 500);
-  }, []);
-
-  // Handle slide rotation
-  const startRotation = useCallback(() => {
     if (!isPlaying) return;
-    
+
     if (displayTimerRef.current) {
       clearTimeout(displayTimerRef.current);
     }
-    
-    const currentItem = allMedia[currentSlide];
+
+    const duration = currentItem.mediaType === 'video' ? 10000 : 4000;
     
     displayTimerRef.current = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % allMedia.length);
-    }, currentItem.mediaType === 'video' ? 10000 : 4000);
-    
-  }, [currentSlide, isPlaying, allMedia.length]);
+    }, duration);
 
-  // Automatic rotation
-  useEffect(() => {
-    if (videosLoaded) {
-      startRotation();
-    }
-    
     return () => {
       if (displayTimerRef.current) {
         clearTimeout(displayTimerRef.current);
       }
     };
-  }, [startRotation, videosLoaded]);
+  }, [currentSlide, isPlaying, currentItem.mediaType, allMedia.length]);
 
-  // Handle video playback when slide changes
+  // Handle video playback
   useEffect(() => {
-    if (!videosLoaded) return;
+    if (currentItem.mediaType === 'video' && videoRef.current) {
+      const video = videoRef.current;
+      video.muted = isMuted;
+      video.currentTime = 0;
+      
+      // Small delay to ensure video is ready
+      const playTimeout = setTimeout(() => {
+        video.play().catch(error => {
+          console.log('Video autoplay failed:', error);
+          // Try again with muted
+          video.muted = true;
+          video.play().catch(err => console.log('Muted play failed:', err));
+        });
+      }, 100);
 
-    // Pause all videos
-    videoRefs.current.forEach((video, idx) => {
-      if (video && allMedia[idx]?.mediaType === 'video') {
-        video.pause();
-        video.currentTime = 0;
-      }
-    });
-
-    // Play current video if it's a video
-    const currentItem = allMedia[currentSlide];
-    if (currentItem.mediaType === 'video') {
-      const currentVideo = videoRefs.current[currentSlide];
-      if (currentVideo) {
-        currentVideo.muted = isMuted;
-        currentVideo.currentTime = 0;
-        
-        const playPromise = currentVideo.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log(`Video ${currentSlide} playing`);
-            })
-            .catch(e => {
-              console.log("Video play error:", e);
-              // Force muted and try again
-              currentVideo.muted = true;
-              currentVideo.play().catch(err => console.log("Retry failed:", err));
-            });
-        }
-      }
+      return () => clearTimeout(playTimeout);
     }
-  }, [currentSlide, isMuted, videosLoaded, allMedia]);
+  }, [currentSlide, currentItem.mediaType, isMuted]);
 
   return (
     <div className="min-h-screen bg-black">
-      {/* SECTION 1: PURE VISUAL FULL SCREEN ROTATION - NO TEXT */}
+      {/* SECTION 1: PURE VISUAL FULL SCREEN ROTATION */}
       <section className="relative h-screen w-screen overflow-hidden bg-black">
-        {/* ALL MEDIA - STACKED WITH OPACITY */}
-        <div className="absolute inset-0">
-          {allMedia.map((item, index) => (
-            <div
-              key={item.id}
-              className="absolute inset-0 h-screen w-screen transition-opacity duration-1000"
-              style={{
-                opacity: currentSlide === index ? 1 : 0,
-                pointerEvents: currentSlide === index ? 'auto' : 'none',
-                zIndex: currentSlide === index ? 1 : 0
-              }}
+        <div className="absolute inset-0 h-full w-full">
+          {currentItem.mediaType === 'image' ? (
+            <img
+              key={currentItem.id}
+              src={currentItem.media}
+              alt=""
+              className="h-full w-full object-cover animate-in fade-in duration-500"
+            />
+          ) : (
+            <video
+              key={currentItem.id}
+              ref={videoRef}
+              className="h-full w-full object-cover"
+              loop
+              muted={isMuted}
+              playsInline
+              autoPlay
+              preload="auto"
             >
-              {item.mediaType === 'image' ? (
-                <img
-                  src={item.media}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <video
-                  ref={el => { videoRefs.current[index] = el; }}
-                  className="h-full w-full object-cover"
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                  webkit-playsinline="true"
-                >
-                  <source src={item.media} type="video/mp4" />
-                </video>
-              )}
-            </div>
-          ))}
+              <source src={currentItem.media} type="video/mp4" />
+            </video>
+          )}
         </div>
 
         {/* Minimal controls at bottom */}
@@ -184,7 +126,7 @@ export default function EventsPage() {
             </div>
           </button>
 
-          {allMedia[currentSlide]?.mediaType === 'video' && (
+          {currentItem.mediaType === 'video' && (
             <button
               onClick={() => setIsMuted(!isMuted)}
               className="text-white hover:text-gray-300 transition-colors"
@@ -199,7 +141,7 @@ export default function EventsPage() {
         </div>
       </section>
 
-      {/* SECTION 2: PURE VISUAL GALLERY - NO TEXT */}
+      {/* SECTION 2: PURE VISUAL GALLERY */}
       <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
