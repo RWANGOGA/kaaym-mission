@@ -1,9 +1,10 @@
+// app/components/Header.tsx (or wherever you have this component)
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Mail, MapPin, Facebook, Instagram, Youtube, Heart, BookOpen } from 'lucide-react';
+import { Menu, X, Mail, MapPin, Youtube, Heart, BookOpen } from 'lucide-react';
 
 // ✅ ONLY YOUR SPECIFIED PAGES
 const navItems = [
@@ -15,13 +16,11 @@ const navItems = [
   { href: '/support', label: 'Support Us' },
 ];
 
-// Social links config
+// Social links config (only YouTube now)
 const siteConfig = {
   socialLinks: {
     email: 'contact@kaaym.org',
-    facebook: 'https://facebook.com/kaaym',
-    instagram: 'https://instagram.com/kaaym',
-    youtube: 'https://youtube.com/kaaym',
+    youtube: 'https://www.youtube.com/@KAAYMMukChapter',
   }
 };
 
@@ -32,12 +31,12 @@ export default function Header() {
   const [verseVisible, setVerseVisible] = useState(true);
   const pathname = usePathname();
 
-  // ✅ Mount guard
+  // Mount guard
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // ✅ Scroll logic
+  // Scroll logic
   useEffect(() => {
     if (!mounted) return;
 
@@ -50,7 +49,7 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [mounted]);
 
-  // ✅ Prevent body scroll when sidebar is open
+  // Prevent body scroll when sidebar is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -62,12 +61,12 @@ export default function Header() {
     };
   }, [mobileMenuOpen]);
 
-  // ✅ Close sidebar on route change
+  // Close sidebar on route change
   useEffect(() => {
     if (mobileMenuOpen) setMobileMenuOpen(false);
   }, [pathname]);
 
-  // ✅ Verse pop in/out animation
+  // Verse pop in/out animation
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
@@ -124,15 +123,15 @@ export default function Header() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <a href={siteConfig.socialLinks.facebook} target="_blank" rel="noopener noreferrer">
-                    <Facebook className="w-4 h-4 hover:text-blue-300 transition-colors" />
-                  </a>
-                  <a href={siteConfig.socialLinks.instagram} target="_blank" rel="noopener noreferrer">
-                    <Instagram className="w-4 h-4 hover:text-pink-300 transition-colors" />
-                  </a>
-                  <a href={siteConfig.socialLinks.youtube} target="_blank" rel="noopener noreferrer">
-                    <Youtube className="w-4 h-4 hover:text-red-300 transition-colors" />
+                {/* Only YouTube in top bar */}
+                <div className="flex items-center gap-4">
+                  <a 
+                    href={siteConfig.socialLinks.youtube} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-red-400 transition-colors"
+                  >
+                    <Youtube className="w-5 h-5" />
                   </a>
                 </div>
               </div>
@@ -160,10 +159,10 @@ export default function Header() {
               </div>
             </Link>
 
-            {/* Desktop Menu - ONLY YOUR 6 PAGES */}
+            {/* Desktop Menu */}
             <div className="hidden lg:flex items-center gap-3">
               {navItems
-                .filter(item => item.href !== '/support') // Support button is separate
+                .filter(item => item.href !== '/support')
                 .map((item) => (
                   <Link
                     key={item.href}
@@ -202,7 +201,7 @@ export default function Header() {
           </div>
         </nav>
 
-        {/* Mobile Sidebar with Pop-in/Pop-out Verse */}
+        {/* Mobile Sidebar */}
         <div
           className={`lg:hidden fixed inset-0 z-40 transform transition-transform duration-300 ease-in-out ${
             mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
@@ -216,13 +215,12 @@ export default function Header() {
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Sidebar Panel - Black Background */}
+          {/* Sidebar Panel */}
           <div className="absolute right-0 top-0 h-full w-full max-w-xs bg-black text-white shadow-xl overflow-hidden">
-            {/* Bible Verse Background - POP IN/OUT ANIMATION */}
+            {/* Bible Verse Background */}
             <div className="absolute inset-0 pointer-events-none z-0">
               <div className="absolute inset-0 bg-black" />
               
-              {/* Complete verse text in yellow with pop animation */}
               <div className={`absolute inset-0 flex items-center justify-center p-6 transition-all duration-1000 ${
                 verseVisible ? 'opacity-100' : 'opacity-0'
               }`}>
@@ -243,17 +241,9 @@ export default function Header() {
                   <p className="mt-6 text-xl font-bold text-yellow-400">
                     Isaiah 1:18-20
                   </p>
-                  
-                  {/* Always visible reference verse */}
-                  <div className="mt-8 pt-4 border-t border-yellow-400/30">
-                    <p className="text-sm text-yellow-300/80">
-                      The mouth of the LORD has spoken.
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              {/* Reference verse that stays visible */}
               <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-auto">
                 <div className="bg-yellow-400/20 backdrop-blur-sm py-3 px-6 mx-6 rounded-lg border border-yellow-400/30">
                   <p className="text-sm font-bold text-yellow-300">
@@ -288,7 +278,7 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Navigation Links - CLEAN WITHOUT BOXES */}
+              {/* Navigation Links */}
               <div className="p-4 flex-1">
                 <nav className="space-y-1">
                   {navItems.map((item) => (
@@ -311,7 +301,7 @@ export default function Header() {
                 </nav>
               </div>
 
-              {/* Non-scrollable Footer Area */}
+              {/* Footer Area */}
               <div className="sticky bottom-0 bg-black/90 backdrop-blur-sm p-6 border-t border-gray-800">
                 <div className="space-y-4">
                   <a
@@ -328,33 +318,16 @@ export default function Header() {
                     <span className="text-gray-300">St. Francis Chapel, Makerere University</span>
                   </div>
 
+                  {/* Only YouTube social icon */}
                   <div className="flex items-center gap-4 pt-4">
-                    <a
-                      href={siteConfig.socialLinks.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 hover:text-blue-400 transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Facebook className="w-5 h-5" />
-                    </a>
-                    <a
-                      href={siteConfig.socialLinks.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 hover:text-pink-400 transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Instagram className="w-5 h-5" />
-                    </a>
                     <a
                       href={siteConfig.socialLinks.youtube}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 hover:text-red-400 transition-colors"
+                      className="p-3 rounded-full bg-red-600/30 hover:bg-red-600/50 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Youtube className="w-5 h-5" />
+                      <Youtube className="w-6 h-6 text-red-500" />
                     </a>
                   </div>
 
@@ -363,7 +336,7 @@ export default function Header() {
                     <p className="text-sm text-gray-400 text-center">
                       <span className="text-yellow-400 font-semibold">KNOW GOD AND MAKE HIM KNOWN.</span>
                       <br />
-                      Thank you for visiting our site . God bless you 
+                      Thank you for visiting our site. God bless you!
                     </p>
                   </div>
                 </div>
