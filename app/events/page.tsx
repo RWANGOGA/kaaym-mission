@@ -67,9 +67,10 @@ export default function EventsPage() {
     };
   }, [startRotation]);
 
-  // Handle video playback
+  // Handle video playback - IMPROVED
   useEffect(() => {
-    videoRefs.current.forEach(video => {
+    // Pause all videos first
+    videoRefs.current.forEach((video, idx) => {
       if (video) {
         video.pause();
         video.currentTime = 0;
@@ -80,8 +81,23 @@ export default function EventsPage() {
     if (currentItem.mediaType === 'video') {
       const currentVideo = videoRefs.current[currentSlide];
       if (currentVideo) {
+        // Ensure video is muted and ready
         currentVideo.muted = isMuted;
-        currentVideo.play().catch(e => console.log("Video play failed:", e));
+        currentVideo.load(); // Reload the video
+        
+        // Add a small delay before playing
+        setTimeout(() => {
+          currentVideo.play()
+            .then(() => {
+              console.log(`Video ${currentSlide} playing successfully`);
+            })
+            .catch(e => {
+              console.log("Video play failed:", e);
+              // Try again with muted if failed
+              currentVideo.muted = true;
+              currentVideo.play().catch(err => console.log("Retry failed:", err));
+            });
+        }, 100);
       }
     }
   }, [currentSlide, isMuted, allMedia]);
@@ -111,15 +127,13 @@ export default function EventsPage() {
                   />
                 ) : (
                   <video
-                    ref={el => {
-                      videoRefs.current[index] = el;
-                    }}
+                    ref={el => { videoRefs.current[index] = el; }}
                     className="h-full w-full object-cover"
                     loop
-                    muted={isMuted}
+                    muted
                     playsInline
-                    autoPlay
-                    preload="metadata"
+                    preload="auto"
+                    webkit-playsinline="true"
                   >
                     <source src={item.media} type="video/mp4" />
                   </video>
@@ -198,12 +212,12 @@ export default function EventsPage() {
             </div>
 
             {/* YouTube Link - Only Text on Page */}
-            <div className="mt-16 text-center z-50">
+            <div className="mt-16 text-center">
               <a 
                 href="https://www.youtube.com/@KAAYMMukChapter" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="relative z-50 inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+                className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
               >
                 <Youtube className="w-4 h-4" />
                 <span>For more events visit our YouTube channel</span>
