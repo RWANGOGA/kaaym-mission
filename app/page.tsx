@@ -25,6 +25,9 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Added your requested console.log
+  console.log("API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+
   return (
     <div>
       {/* Hero Section with Image Slideshow Background */}
