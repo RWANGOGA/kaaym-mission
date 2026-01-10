@@ -104,8 +104,9 @@ export default function AboutPage() {
 
   return (
     <div className="overflow-hidden bg-white">
-      {/* Hero Section - Slightly larger geometric images */}
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
         <div className="absolute inset-0">
           <img 
             src="/images/kawempe.jpg" 
@@ -115,10 +116,10 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-orange-600/90 via-orange-500/85 to-amber-600/90"></div>
         </div>
 
-        {/* Left Geometric Image - Increased size */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/2 sm:w-5/12 lg:w-1/3 z-10 pointer-events-none">
+        {/* Left Geometric Image - Slightly smaller, balanced medium size */}
+        <div className="absolute left-0 top-0 bottom-0 w-5/12 sm:w-5/12 lg:w-5/24 z-10 pointer-events-none">
           <div 
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-56 sm:w-72 lg:w-96 h-72 sm:h-96 lg:h-[480px] -translate-x-10 sm:-translate-x-14 lg:-translate-x-20"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-48 sm:w-60 lg:w-80 h-64 sm:h-80 lg:h-96 -translate-x-8 sm:-translate-x-12 lg:-translate-x-16"
             style={{
               clipPath: 'polygon(0 0, 100% 10%, 90% 90%, 0 100%)',
               backgroundImage: 'url(/images/Kaaym12.jpeg)',
@@ -128,10 +129,10 @@ export default function AboutPage() {
           />
         </div>
 
-        {/* Right Geometric Image - Increased size */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 sm:w-5/12 lg:w-1/3 z-10 pointer-events-none hidden sm:block">
+        {/* Right Geometric Image - Slightly smaller, balanced medium size */}
+        <div className="absolute right-0 top-0 bottom-0 w-5/12 sm:w-5/12 lg:w-5/24 z-10 pointer-events-none hidden sm:block">
           <div 
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-56 sm:w-72 lg:w-96 h-56 sm:h-72 lg:h-96 translate-x-10 sm:translate-x-14 lg:translate-x-20 rounded-full overflow-hidden shadow-2xl"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-48 sm:w-60 lg:w-80 h-48 sm:h-64 lg:h-80 translate-x-8 sm:translate-x-12 lg:translate-x-16 rounded-full overflow-hidden shadow-2xl"
             style={{
               backgroundImage: 'url(/images/KAAYM.jpg)',
               backgroundSize: 'cover',
@@ -143,7 +144,8 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight drop-shadow-2xl">
-              Welcome to<br />KAAYM
+              Welcome to<br />
+              KAAYM
             </h1>
 
             <p className="text-2xl md:text-3xl text-white/95 mb-8 font-light drop-shadow-lg">
@@ -151,11 +153,17 @@ export default function AboutPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-              <Link href="/contact" className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl">
-                Be part of us
+              <Link
+                href="/contact"
+                className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl"
+              >
+                Be part of us 
               </Link>
-              <Link href="/ministries" className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl">
-                Fellowship with us
+              <Link
+                href="/ministries"
+                className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl"
+              >
+                Fellowship with us 
               </Link>
             </div>
 
@@ -187,7 +195,6 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* Journey Steps - Improved text design */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16">
               {journeySteps.map((step, index) => {
                 const IconComponent = step.icon;
@@ -219,9 +226,7 @@ export default function AboutPage() {
                       
                       <p className="text-gray-800 text-center text-base sm:text-lg leading-7 font-medium tracking-wide">
                         {step.desc.split('**').map((part, i) => 
-                          i % 2 === 0 ? (
-                            part
-                          ) : (
+                          i % 2 === 0 ? part : (
                             <span key={i} className={`font-bold bg-gradient-to-r ${colors[index]} bg-clip-text text-transparent`}>
                               {part}
                             </span>
@@ -234,7 +239,6 @@ export default function AboutPage() {
               })}
             </div>
 
-            {/* Story Content */}
             <div className={`bg-white/90 backdrop-blur-md rounded-3xl p-10 md:p-16 shadow-2xl border border-gray-200 ${visibleSections.has(1) ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '0.6s' }}>
               <div className="prose prose-lg md:prose-xl max-w-none text-gray-800">
                 <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-10 text-center">
@@ -314,7 +318,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Core Values Section - Improved text design */}
+      {/* Core Values Section */}
       <section className="py-20 relative" data-section="3">
         <div className="absolute inset-0">
           <img 
@@ -363,10 +367,10 @@ export default function AboutPage() {
                         {value.title}
                       </h3>
                       
-                      <p className="text-gray-800 text-center text-base sm:text-lg leading-7 font-medium tracking-wide">
+                      <p className="text-gray-800 text-center leading-relaxed text-base sm:text-lg">
                         {value.description.split(/["“]([^"”]+)["”]/).map((part, i) => 
                           i % 2 === 1 ? (
-                            <span key={i} className="font-semibold italic text-gray-900">
+                            <span key={i} className="font-semibold text-orange-700">
                               {part}
                             </span>
                           ) : part
