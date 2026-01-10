@@ -361,7 +361,7 @@ export default function Header() {
                   {/* Prayer Encouragement */}
                   <div className="pt-4 mt-4 border-t border-gray-800">
                     <p className="text-sm text-gray-400 text-center">
-                      <span className="text-yellow-400 font-semibold">NKOW GOD AND MAKE HIM KNOWN.</span>
+                      <span className="text-yellow-400 font-semibold">KNOW GOD AND MAKE HIM KNOWN.</span>
                       <br />
                       Thank you for visiting our site . God bless you 
                     </p>
