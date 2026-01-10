@@ -1,7 +1,7 @@
 // app/events/page.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Youtube, Play, Volume2, VolumeX } from 'lucide-react';
 
 interface MediaItem {
@@ -14,7 +14,7 @@ export default function EventsPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const displayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // ALL MEDIA - Images and Videos
@@ -40,76 +40,93 @@ export default function EventsPage() {
     { id: 'i8', media: '/images/committe.jpg', mediaType: 'image' },
   ];
 
-  const currentItem = allMedia[currentSlide];
-
-  // Handle automatic slide progression
-  useEffect(() => {
+  // Handle slide rotation
+  const startRotation = useCallback(() => {
     if (!isPlaying) return;
-
+    
     if (displayTimerRef.current) {
       clearTimeout(displayTimerRef.current);
     }
-
-    const duration = currentItem.mediaType === 'video' ? 10000 : 4000;
+    
+    const currentItem = allMedia[currentSlide];
     
     displayTimerRef.current = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % allMedia.length);
-    }, duration);
+    }, currentItem.mediaType === 'video' ? 10000 : 4000);
+    
+  }, [currentSlide, isPlaying, allMedia.length]);
 
+  // Automatic rotation
+  useEffect(() => {
+    startRotation();
+    
     return () => {
       if (displayTimerRef.current) {
         clearTimeout(displayTimerRef.current);
       }
     };
-  }, [currentSlide, isPlaying, currentItem.mediaType, allMedia.length]);
+  }, [startRotation]);
 
   // Handle video playback
   useEffect(() => {
-    if (currentItem.mediaType === 'video' && videoRef.current) {
-      const video = videoRef.current;
-      video.muted = isMuted;
-      video.currentTime = 0;
-      
-      // Small delay to ensure video is ready
-      const playTimeout = setTimeout(() => {
-        video.play().catch(error => {
-          console.log('Video autoplay failed:', error);
-          // Try again with muted
-          video.muted = true;
-          video.play().catch(err => console.log('Muted play failed:', err));
-        });
-      }, 100);
+    videoRefs.current.forEach(video => {
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
 
-      return () => clearTimeout(playTimeout);
+    const currentItem = allMedia[currentSlide];
+    if (currentItem.mediaType === 'video') {
+      const currentVideo = videoRefs.current[currentSlide];
+      if (currentVideo) {
+        currentVideo.muted = isMuted;
+        currentVideo.play().catch(e => console.log("Video play failed:", e));
+      }
     }
-  }, [currentSlide, currentItem.mediaType, isMuted]);
+  }, [currentSlide, isMuted, allMedia]);
 
   return (
     <div className="min-h-screen bg-black">
-      {/* SECTION 1: PURE VISUAL FULL SCREEN ROTATION */}
+      {/* SECTION 1: PURE VISUAL FULL SCREEN ROTATION - NO TEXT */}
       <section className="relative h-screen w-screen overflow-hidden bg-black">
-        <div className="absolute inset-0 h-full w-full">
-          {currentItem.mediaType === 'image' ? (
-            <img
-              key={currentItem.id}
-              src={currentItem.media}
-              alt=""
-              className="h-full w-full object-cover animate-in fade-in duration-500"
-            />
-          ) : (
-            <video
-              key={currentItem.id}
-              ref={videoRef}
-              className="h-full w-full object-cover"
-              loop
-              muted={isMuted}
-              playsInline
-              autoPlay
-              preload="auto"
-            >
-              <source src={currentItem.media} type="video/mp4" />
-            </video>
-          )}
+        {/* VERTICAL ROTATING GALLERY */}
+        <div className="absolute inset-0">
+          <div 
+            className="h-full transition-transform duration-1000 ease-in-out"
+            style={{ 
+              transform: `translateY(-${currentSlide * 100}%)` 
+            }}
+          >
+            {allMedia.map((item, index) => (
+              <div
+                key={item.id}
+                className="h-screen w-screen relative bg-black"
+              >
+                {item.mediaType === 'image' ? (
+                  <img
+                    src={item.media}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <video
+                    ref={el => {
+                      videoRefs.current[index] = el;
+                    }}
+                    className="h-full w-full object-cover"
+                    loop
+                    muted={isMuted}
+                    playsInline
+                    autoPlay
+                    preload="metadata"
+                  >
+                    <source src={item.media} type="video/mp4" />
+                  </video>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Minimal controls at bottom */}
@@ -126,7 +143,7 @@ export default function EventsPage() {
             </div>
           </button>
 
-          {currentItem.mediaType === 'video' && (
+          {allMedia[currentSlide]?.mediaType === 'video' && (
             <button
               onClick={() => setIsMuted(!isMuted)}
               className="text-white hover:text-gray-300 transition-colors"
@@ -141,7 +158,7 @@ export default function EventsPage() {
         </div>
       </section>
 
-      {/* SECTION 2: PURE VISUAL GALLERY */}
+      {/* SECTION 2: PURE VISUAL GALLERY - NO TEXT */}
       <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
@@ -181,12 +198,12 @@ export default function EventsPage() {
             </div>
 
             {/* YouTube Link - Only Text on Page */}
-            <div className="mt-16 text-center">
+            <div className="mt-16 text-center z-50">
               <a 
                 href="https://www.youtube.com/@KAAYMMukChapter" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+                className="relative z-50 inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
               >
                 <Youtube className="w-4 h-4" />
                 <span>For more events visit our YouTube channel</span>
