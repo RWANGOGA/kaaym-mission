@@ -14,6 +14,7 @@ export default function EventsPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [videosLoaded, setVideosLoaded] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const displayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -40,6 +41,30 @@ export default function EventsPage() {
     { id: 'i8', media: '/images/committe.jpg', mediaType: 'image' },
   ];
 
+  // Initialize all videos on mount
+  useEffect(() => {
+    const initVideos = async () => {
+      for (let i = 0; i < videoRefs.current.length; i++) {
+        const video = videoRefs.current[i];
+        if (video && allMedia[i]?.mediaType === 'video') {
+          video.muted = true;
+          video.load();
+          try {
+            await video.play();
+            video.pause();
+            video.currentTime = 0;
+          } catch (e) {
+            console.log(`Failed to init video ${i}:`, e);
+          }
+        }
+      }
+      setVideosLoaded(true);
+    };
+
+    // Small delay to ensure DOM is ready
+    setTimeout(initVideos, 500);
+  }, []);
+
   // Handle slide rotation
   const startRotation = useCallback(() => {
     if (!isPlaying) return;
@@ -58,89 +83,91 @@ export default function EventsPage() {
 
   // Automatic rotation
   useEffect(() => {
-    startRotation();
+    if (videosLoaded) {
+      startRotation();
+    }
     
     return () => {
       if (displayTimerRef.current) {
         clearTimeout(displayTimerRef.current);
       }
     };
-  }, [startRotation]);
+  }, [startRotation, videosLoaded]);
 
-  // Handle video playback - IMPROVED
+  // Handle video playback when slide changes
   useEffect(() => {
-    // Pause all videos first
+    if (!videosLoaded) return;
+
+    // Pause all videos
     videoRefs.current.forEach((video, idx) => {
-      if (video) {
+      if (video && allMedia[idx]?.mediaType === 'video') {
         video.pause();
         video.currentTime = 0;
       }
     });
 
+    // Play current video if it's a video
     const currentItem = allMedia[currentSlide];
     if (currentItem.mediaType === 'video') {
       const currentVideo = videoRefs.current[currentSlide];
       if (currentVideo) {
-        // Ensure video is muted and ready
         currentVideo.muted = isMuted;
-        currentVideo.load(); // Reload the video
+        currentVideo.currentTime = 0;
         
-        // Add a small delay before playing
-        setTimeout(() => {
-          currentVideo.play()
+        const playPromise = currentVideo.play();
+        if (playPromise !== undefined) {
+          playPromise
             .then(() => {
-              console.log(`Video ${currentSlide} playing successfully`);
+              console.log(`Video ${currentSlide} playing`);
             })
             .catch(e => {
-              console.log("Video play failed:", e);
-              // Try again with muted if failed
+              console.log("Video play error:", e);
+              // Force muted and try again
               currentVideo.muted = true;
               currentVideo.play().catch(err => console.log("Retry failed:", err));
             });
-        }, 100);
+        }
       }
     }
-  }, [currentSlide, isMuted, allMedia]);
+  }, [currentSlide, isMuted, videosLoaded, allMedia]);
 
   return (
     <div className="min-h-screen bg-black">
       {/* SECTION 1: PURE VISUAL FULL SCREEN ROTATION - NO TEXT */}
       <section className="relative h-screen w-screen overflow-hidden bg-black">
-        {/* VERTICAL ROTATING GALLERY */}
+        {/* ALL MEDIA - STACKED WITH OPACITY */}
         <div className="absolute inset-0">
-          <div 
-            className="h-full transition-transform duration-1000 ease-in-out"
-            style={{ 
-              transform: `translateY(-${currentSlide * 100}%)` 
-            }}
-          >
-            {allMedia.map((item, index) => (
-              <div
-                key={item.id}
-                className="h-screen w-screen relative bg-black"
-              >
-                {item.mediaType === 'image' ? (
-                  <img
-                    src={item.media}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <video
-                    ref={el => { videoRefs.current[index] = el; }}
-                    className="h-full w-full object-cover"
-                    loop
-                    muted
-                    playsInline
-                    preload="auto"
-                    webkit-playsinline="true"
-                  >
-                    <source src={item.media} type="video/mp4" />
-                  </video>
-                )}
-              </div>
-            ))}
-          </div>
+          {allMedia.map((item, index) => (
+            <div
+              key={item.id}
+              className="absolute inset-0 h-screen w-screen transition-opacity duration-1000"
+              style={{
+                opacity: currentSlide === index ? 1 : 0,
+                pointerEvents: currentSlide === index ? 'auto' : 'none',
+                zIndex: currentSlide === index ? 1 : 0
+              }}
+            >
+              {item.mediaType === 'image' ? (
+                <img
+                  src={item.media}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <video
+                  ref={el => { videoRefs.current[index] = el; }}
+                  className="h-full w-full object-cover"
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  webkit-playsinline="true"
+                >
+                  <source src={item.media} type="video/mp4" />
+                </video>
+              )}
+            </div>
+          ))}
         </div>
 
         {/* Minimal controls at bottom */}
