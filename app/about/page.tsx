@@ -2,7 +2,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Cross, Heart, Users, Target, Award, MapPin, Sparkles, BookOpen, Globe, ChevronDown, Star, Send, Compass, Shield, Lightbulb, ArrowRight } from 'lucide-react';
+import { 
+  Cross, 
+  Heart, 
+  Users, 
+  Target, 
+  Award, 
+  MapPin, 
+  ChevronDown, 
+  Lightbulb, 
+  ArrowRight,
+  Shield,
+} from 'lucide-react';
 import { siteConfig } from '../config/site';
 import Link from 'next/link';
 
@@ -33,59 +44,68 @@ export default function AboutPage() {
     {
       icon: Cross,
       title: 'Faith',
-      titleColor: 'text-sky-600',
       color: 'from-sky-500 to-blue-600',
-      description: 'Faith is the driving force behind Christian mission. It compels believers to go, serve, and proclaim the Gospel with confidence in God’s calling rather than in their own strength. As Scripture teaches, “faith is the assurance of things hoped for, the conviction of things not seen” (Hebrews 11:1). This faith enables Christians to step into unfamiliar places, overcome challenges, and remain committed to sharing Christ’s love through word and action, trusting that God is at work beyond what they can see.'
+      description: 'Faith is the driving force behind Christian mission. It compels believers to go, serve, and proclaim the Gospel with confidence in God’s calling rather than in their own strength. As Scripture teaches, “faith is the assurance of things hoped for, the conviction of things not seen” (Hebrews 11:1). This faith enables Christians to step into unfamiliar places, overcome challenges, and remain committed to sharing Christ’s love.'
     },
     {
       icon: Heart,
       title: 'Love',
-      titleColor: 'text-green-600',
       color: 'from-orange-500 to-orange-600',
-      description: 'Showing Christ\'s love through service and compassion   Through mission in our home dioceses, we share the Gospel in familiar cultural and social contexts, making the message of Christ more relevant and impactful. This mission is motivated by love and obedience, as Scripture reminds us that “we love because He first loved us” (1 John 4:19). By serving at home, we become instruments of unity, encouragement, and transformation within the Church and the wider community.'
+      description: 'Showing Christ\'s love through service and compassion. Through mission in our home dioceses, we share the Gospel in familiar contexts, making the message of Christ more relevant and impactful. This mission is motivated by love and obedience, as Scripture reminds us that “we love because He first loved us” (1 John 4:19).'
     },
     {
       icon: Users,
       title: 'Fellowship',
-      titleColor: 'text-purple-600',
       color: 'from-green-700 to-green-800',
-      description: ' Fellowship strengthens our faith and unity in Christ. We gather every Monday, Thursday, and Friday for prayer, Bible study, and mutual encouragement, in obedience to Scripture: “Let us consider how to stir up one another to love and good works, not neglecting to meet together” (Hebrews 10:24–25).Building strong community bonds among believers'
+      description: 'Fellowship strengthens our faith and unity in Christ. We gather every Monday, Thursday, and Friday for prayer, Bible study, and mutual encouragement, in obedience to Scripture: “Let us consider how to stir up one another to love and good works...” (Hebrews 10:24–25). Building strong community bonds among believers.'
     },
     {
       icon: Target,
       title: 'Mission',
-      titleColor: 'text-yellow-600',
       color: 'from-amber-700 to-amber-800',
-      description: ' Mission is our response to Christ’s call to serve and share the Gospel. We engage in mission activities within our home dioceses, reaching out to communities through evangelism, service, and fellowship, guided by Scripture: “Go therefore and make disciples of all nations” (Matthew 28:19).Committed to spreading the Gospel to all nations'
+      description: 'Mission is our response to Christ’s call to serve and share the Gospel. We engage in mission activities within our home dioceses, reaching out through evangelism, service, and fellowship, guided by Scripture: “Go therefore and make disciples of all nations” (Matthew 28:19).'
     },
     {
       icon: Shield,
       title: 'Excellence',
-      titleColor: 'text-gray-800',
       color: 'from-sky-600 to-sky-700',
-      description: ' Mission is carried out with a spirit of excellence as we serve and share the Gospel in our home dioceses. We strive to honor God through disciplined service, integrity, and commitment in all mission activities, guided by Scripture: “Whatever you do, work at it with all your heart, as working for the Lord” (Colossians 3:23). Pursuing excellence in all our ministry endeavors'
+      description: 'Mission is carried out with a spirit of excellence. We strive to honor God through disciplined service, integrity, and commitment in all mission activities, guided by Scripture: “Whatever you do, work at it with all your heart, as working for the Lord” (Colossians 3:23).'
     },
     {
       icon: MapPin,
       title: 'Outreach',
-      titleColor: 'text-white',
       color: 'from-orange-600 to-red-600',
-      description: 'Since its founding 39 years ago, KAAYM has passionately lived out the Great Commission, “Go into all the world and preach the gospel to all creation” (Mark 16:15), through dynamic outreach that includes regular services in Kampala Anglican churches, broadcasting messages of hope on Family TV, and dedicated ministry to elders, ensuring the light of Christ shines in every sphere of societyReaching out to communities with the message of hope'
+      description: 'Since its founding 39 years ago, KAAYM has passionately lived out the Great Commission (Mark 16:15), through dynamic outreach including regular services in Kampala Anglican churches, broadcasting on Family TV, and ministry to elders — ensuring the light of Christ shines everywhere.'
     }
   ];
 
   const journeySteps = [
-    { icon: Lightbulb, label: 'BEGINNING', desc: 'Founded with vision and passion in 1987  inspired by  Late Bishop Kivengere teaching to young Anglican christain youth at Makerere University ' },
-    { icon: Users, label: 'GROWTH', desc: 'Expanding our community and our faith and salvation accross our home dioceses' },
-    { icon: MapPin, label: 'MISSIONS', desc: 'Reaching Western Uganda through our home dioceses every end of the semster and some times in the middle of the semster durring holidays  above all Making  Jesus Christ Known by everyone' },
-    { icon: Heart, label: 'IMPACT', desc: 'Transforming lives spiritually, reviving souls that  are always lost , restoring marriages, lost hopes , inspiring young youth in our dioceses  , grooming young christians into responsiple citizens who are discent morally upright  and above all saved ' }
+    { 
+      icon: Lightbulb, 
+      label: 'BEGINNING', 
+      desc: 'Founded with vision and passion in **1987** — inspired by the powerful teaching of the Late Bishop Festo Kivengere to young Anglican Christian youth at Makerere University.' 
+    },
+    { 
+      icon: Users, 
+      label: 'GROWTH', 
+      desc: '**Expanding** our community, spreading faith and the message of salvation across our home dioceses with increasing impact each year.' 
+    },
+    { 
+      icon: MapPin, 
+      label: 'MISSIONS', 
+      desc: 'Reaching **Western Uganda** every end of semester (and sometimes mid-semester during holidays) — above all, making Jesus Christ known to everyone.' 
+    },
+    { 
+      icon: Heart, 
+      label: 'IMPACT', 
+      desc: 'Transforming lives spiritually, **reviving lost souls**, restoring marriages, renewing hope, inspiring youth, grooming responsible morally upright citizens — and above all, leading people to salvation.' 
+    }
   ];
 
   return (
     <div className="overflow-hidden bg-white">
-      {/* Hero Section with Background Image and Geometric Photos */}
+      {/* Hero Section - Slightly larger geometric images */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
         <div className="absolute inset-0">
           <img 
             src="/images/kawempe.jpg" 
@@ -95,10 +115,10 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-orange-600/90 via-orange-500/85 to-amber-600/90"></div>
         </div>
 
-        {/* Geometric Image - Left Side */}
-        <div className="absolute left-0 top-0 bottom-0 w-1/3 hidden lg:block z-10">
+        {/* Left Geometric Image - Increased size */}
+        <div className="absolute left-0 top-0 bottom-0 w-1/2 sm:w-5/12 lg:w-1/3 z-10 pointer-events-none">
           <div 
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-96 h-[600px] -translate-x-16"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-56 sm:w-72 lg:w-96 h-72 sm:h-96 lg:h-[480px] -translate-x-10 sm:-translate-x-14 lg:-translate-x-20"
             style={{
               clipPath: 'polygon(0 0, 100% 10%, 90% 90%, 0 100%)',
               backgroundImage: 'url(/images/Kaaym12.jpeg)',
@@ -108,10 +128,10 @@ export default function AboutPage() {
           />
         </div>
 
-        {/* Geometric Image - Right Side */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 hidden lg:block z-10">
+        {/* Right Geometric Image - Increased size */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 sm:w-5/12 lg:w-1/3 z-10 pointer-events-none hidden sm:block">
           <div 
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] translate-x-16 rounded-full overflow-hidden shadow-2xl"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-56 sm:w-72 lg:w-96 h-56 sm:h-72 lg:h-96 translate-x-10 sm:translate-x-14 lg:translate-x-20 rounded-full overflow-hidden shadow-2xl"
             style={{
               backgroundImage: 'url(/images/KAAYM.jpg)',
               backgroundSize: 'cover',
@@ -122,34 +142,23 @@ export default function AboutPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Main Title */}
             <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight drop-shadow-2xl">
-              Welcome to<br />
-              KAAYM
+              Welcome to<br />KAAYM
             </h1>
 
-            {/* Subtitle */}
             <p className="text-2xl md:text-3xl text-white/95 mb-8 font-light drop-shadow-lg">
               Kigezi Ankore Anglican Youth Missioners
             </p>
 
-            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-              <Link
-                href="/contact"
-                className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl"
-              >
-                Be part of us 
+              <Link href="/contact" className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl">
+                Be part of us
               </Link>
-              <Link
-                href="/ministries"
-                className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl"
-              >
-                Fellowship with us 
+              <Link href="/ministries" className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl">
+                Fellowship with us
               </Link>
             </div>
 
-            {/* Location Badge */}
             <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-xl px-8 py-4 rounded-full border border-white/40">
               <MapPin className="w-6 h-6 text-white" />
               <span className="text-lg text-white font-medium">St. Francis Chapel, Makerere University</span>
@@ -157,56 +166,67 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
           <ChevronDown className="w-10 h-10 text-white" />
         </div>
       </section>
 
-      {/* Our Story Section – Now with yellow.jpg background and larger readable text */}
+      {/* Our Story Section */}
       <section className="py-20 relative overflow-hidden" data-section="1">
-        {/* Background Image */}
         <div className="absolute inset-0">
-          <img 
-            src="/images/yellow.jpg" 
-            alt="KAAYM Story Background"
-            className="w-full h-full object-cover"
-          />
-          {/* Dark overlay for better text readability */}
+          <img src="/images/yellow.jpg" alt="KAAYM Story" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-6xl mx-auto">
-            {/* Header */}
             <div className={`text-center mb-16 ${visibleSections.has(1) ? 'animate-slide-in-right' : 'opacity-0'}`}>
-              <h2 className="text-5xl md:text-6xl font-black text-white mb-4 drop-shadow-2xl">
-                Our Story
-              </h2>
+              <h2 className="text-5xl md:text-6xl font-black text-white mb-4 drop-shadow-2xl">Our Story</h2>
               <p className="text-2xl md:text-3xl text-white/95 max-w-2xl mx-auto drop-shadow-lg">
                 A journey of faith, growth, and transformation
               </p>
             </div>
 
-            {/* Journey Steps */}
-            <div className="grid md:grid-cols-4 gap-6 mb-16">
+            {/* Journey Steps - Improved text design */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-16">
               {journeySteps.map((step, index) => {
-                const Icon = step.icon;
+                const IconComponent = step.icon;
+                const colors = [
+                  'from-amber-600 to-orange-700',
+                  'from-sky-600 to-blue-700',
+                  'from-violet-600 to-purple-700',
+                  'from-emerald-600 to-teal-700'
+                ];
+                
                 return (
                   <div
                     key={index}
-                    className={`${visibleSections.has(1) ? 'animate-drop-in' : 'opacity-0'}`}
-                    style={{ animationDelay: `${index * 0.15}s` }}
+                    className={`group relative ${visibleSections.has(1) ? 'animate-drop-in' : 'opacity-0'}`}
+                    style={{ animationDelay: `${index * 0.12}s` }}
                   >
-                    <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-t-4 border-sky-500">
-                      <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-orange-500 rounded-full flex items-center justify-center mb-4 mx-auto">
-                        <Icon className="w-8 h-8 text-white" />
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${colors[index]} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                    
+                    <div className="relative bg-white/96 backdrop-blur-sm rounded-2xl p-7 shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
+                      <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${colors[index]}`} />
+                      
+                      <div className={`w-16 h-16 mx-auto mb-5 rounded-xl bg-gradient-to-br ${colors[index]} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                        <IconComponent className="w-8 h-8 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                      
+                      <h3 className="text-xl md:text-2xl font-extrabold text-center mb-4 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                         {step.label}
                       </h3>
-                      <p className="text-gray-600 text-center text-sm">
-                        {step.desc}
+                      
+                      <p className="text-gray-800 text-center text-base sm:text-lg leading-7 font-medium tracking-wide">
+                        {step.desc.split('**').map((part, i) => 
+                          i % 2 === 0 ? (
+                            part
+                          ) : (
+                            <span key={i} className={`font-bold bg-gradient-to-r ${colors[index]} bg-clip-text text-transparent`}>
+                              {part}
+                            </span>
+                          )
+                        )}
                       </p>
                     </div>
                   </div>
@@ -214,7 +234,7 @@ export default function AboutPage() {
               })}
             </div>
 
-            {/* Story Content – Larger, readable text with white semi-transparent background */}
+            {/* Story Content */}
             <div className={`bg-white/90 backdrop-blur-md rounded-3xl p-10 md:p-16 shadow-2xl border border-gray-200 ${visibleSections.has(1) ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '0.6s' }}>
               <div className="prose prose-lg md:prose-xl max-w-none text-gray-800">
                 <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-10 text-center">
@@ -226,11 +246,11 @@ export default function AboutPage() {
                 </p>
 
                 <p className="text-lg md:text-xl leading-relaxed mb-8">
-                  Rev. Dr. Medard Birungyinyuma was a renowned evangelist and founder of World Vision Ministries. Robert Ndwahura, Turyamuhika Silvanus Boni, Gideon Batumirwa, Jonathan Besigyewe and Justus Nyagaba all who were Makerere students, came together and formed Kigezi Anglican Youth Mission (KAAYM) in 1987 and this was soon after the death of Bishop Festo Kivengere where God used them mightily in Kigezi diocese. Later in 1992, people from Ankole were also arrested in Christ and they joined Kigezi to form Kigezi Ankole Anglican Youth Mission (KAAYM).
+                  Rev. Dr. Medard BirungyibyaYesu was a renowned evangelist and founder of World Shine Ministries. Robert Ndwahura, Turyamuhika Silvanus Boni, Gideon Batumirwa, Jonathan Besigyewe and Justus Nyagaba all who were Makerere students, came together and formed Kigezi Anglican Youth Mission (KAAYM) in 1987 and this was soon after the death of Bishop Festo Kivengere where God used them mightily in Kigezi diocese. Later in 1992, people from Ankole were also compleded in Christ and they joined Kigezi to form Kigezi Ankole Anglican Youth Mission (KAAYM).
                 </p>
 
                 <p className="text-lg md:text-xl leading-relaxed mb-8">
-                  Through the years, thousands have given their lives to Christ, souls conquered, families reconciled and many others through KAAYM. We carry out outreaches in schools, hospitals, prisons etc., in addition to beginning of semester, mid semester and of ancient missions. The weekly KAAYM program includes fellowship, prayer meetings, choir practice and monthly meetings.
+                  Through the years, thousands have given their lives to Christ, souls conquered, families reconciled and many others through KAAYM. We carry out outreaches in schools, hospitals, prisons etc., in addition to beginning of semester, mid semester and of end semseter missions. The weekly KAAYM program includes fellowship, prayer meetings, choir practice and elders visits and  services in Kawempe.
                 </p>
 
                 <p className="text-lg md:text-xl leading-relaxed mb-8">
@@ -248,7 +268,6 @@ export default function AboutPage() {
 
       {/* Mission & Vision Section */}
       <section className="py-20 relative overflow-hidden" data-section="2">
-        {/* Background Image */}
         <div className="absolute inset-0">
           <img 
             src="/images/KAAYM.jpg" 
@@ -261,7 +280,6 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-10">
-              {/* Mission */}
               <div className={`${visibleSections.has(2) ? 'animate-slide-in-left' : 'opacity-0'}`}>
                 <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-10 shadow-2xl hover:shadow-orange-500/20 transition-all duration-500 hover:-translate-y-2">
                   <div className="flex items-center gap-4 mb-6">
@@ -277,7 +295,6 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Vision */}
               <div className={`${visibleSections.has(2) ? 'animate-slide-in-right' : 'opacity-0'}`} style={{ animationDelay: '0.3s' }}>
                 <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-10 shadow-2xl hover:shadow-sky-500/20 transition-all duration-500 hover:-translate-y-2">
                   <div className="flex items-center gap-4 mb-6">
@@ -297,9 +314,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Core Values Section */}
+      {/* Core Values Section - Improved text design */}
       <section className="py-20 relative" data-section="3">
-        {/* Background Image */}
         <div className="absolute inset-0">
           <img 
             src="/images/image01.jpg" 
@@ -316,7 +332,6 @@ export default function AboutPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-6xl mx-auto">
-            {/* Header */}
             <div className={`text-center mb-16 ${visibleSections.has(3) ? 'animate-fade-in-up' : 'opacity-0'}`}>
               <h2 className="text-5xl md:text-6xl font-black text-white mb-4 drop-shadow-2xl">
                 Our Core Values
@@ -326,25 +341,36 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* Values Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-7 md:gap-9">
               {values.map((value, index) => {
-                const Icon = value.icon;
+                const IconComponent = value.icon;
                 return (
                   <div
                     key={index}
-                    className={`${visibleSections.has(3) ? 'animate-drop-in' : 'opacity-0'}`}
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    className={`group relative ${visibleSections.has(3) ? 'animate-drop-in' : 'opacity-0'}`}
+                    style={{ animationDelay: `${index * 0.08}s` }}
                   >
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:-translate-y-3 border-t-4 border-sky-500 group">
-                      <div className={`w-20 h-20 bg-gradient-to-br ${value.color} rounded-full flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                        <Icon className="w-10 h-10 text-white" />
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${value.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                    
+                    <div className="relative bg-white/92 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-3 transition-all duration-300">
+                      <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${value.color} rounded-t-2xl`} />
+                      
+                      <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                        <IconComponent className="w-10 h-10 text-white" />
                       </div>
-                      <h3 className={`text-2xl md:text-3xl font-black text-center mb-4 ${value.titleColor}`}>
+                      
+                      <h3 className={`text-2xl md:text-3xl font-extrabold text-center mb-4 bg-gradient-to-r ${value.color} bg-clip-text text-transparent`}>
                         {value.title}
                       </h3>
-                      <p className="text-gray-700 text-center leading-relaxed text-base">
-                        {value.description}
+                      
+                      <p className="text-gray-800 text-center text-base sm:text-lg leading-7 font-medium tracking-wide">
+                        {value.description.split(/["“]([^"”]+)["”]/).map((part, i) => 
+                          i % 2 === 1 ? (
+                            <span key={i} className="font-semibold italic text-gray-900">
+                              {part}
+                            </span>
+                          ) : part
+                        )}
                       </p>
                     </div>
                   </div>
@@ -359,10 +385,8 @@ export default function AboutPage() {
       <section className="py-20 bg-white" data-section="4">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
-            {/* First Card - New to KAAYM */}
             <div className={`mb-20 ${visibleSections.has(4) ? 'animate-fade-in-up' : 'opacity-0'}`}>
               <div className="grid md:grid-cols-2 gap-12 items-center">
-                {/* Image Side */}
                 <div className="relative order-2 md:order-1">
                   <div className="relative">
                     <div className="absolute -top-8 -left-8 w-full h-full bg-gradient-to-br from-orange-400 to-amber-500 rounded-3xl transform rotate-3"></div>
@@ -376,7 +400,6 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                {/* Content Side */}
                 <div className="order-1 md:order-2">
                   <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     New to KAAYM? We're ready to help!
@@ -397,10 +420,8 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Second Card */}
             <div className={`${visibleSections.has(4) ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '0.3s' }}>
               <div className="grid md:grid-cols-2 gap-12 items-center">
-                {/* Content Side */}
                 <div>
                   <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     Are you looking for a fellowship? Find what you need!
@@ -425,7 +446,6 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                {/* Image Side */}
                 <div className="relative">
                   <div className="relative">
                     <div className="absolute -top-8 -right-8 w-64 h-64 bg-gradient-to-br from-teal-300 to-teal-400 rounded-full opacity-50"></div>
