@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Heart, Users, MapPin, Calendar, BookOpen, Cross, Sparkles, Star, Zap } from 'lucide-react';
 import { siteConfig } from '../config/site';
-import { auth } from '../lib/firebase/client'; // ← Added this import for Firebase auth
 
 export default function HomePage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -25,10 +24,6 @@ export default function HomePage() {
 
     return () => clearInterval(interval);
   }, []);
-
-  // Added your requested console logs
-  console.log("API Key:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-  console.log("Firebase Auth initialized:", !!auth.currentUser); // Will show true/false
 
   return (
     <div>
