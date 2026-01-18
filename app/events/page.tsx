@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8081';
 
 interface DownloadableFile {
   id: number;
