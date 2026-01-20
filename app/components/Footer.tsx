@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facebook, Instagram, Youtube } from 'lucide-react';
+import { Youtube, Mail } from 'lucide-react';
 import { siteConfig } from '../config/site';
 import { useState, useEffect } from 'react';
 
@@ -11,7 +11,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [imageError, setImageError] = useState(false);
 
-  // Background images that will cycle (full cover)
+  // Background images that cycle (full cover)
   const backgroundImages = [
     '/images/Ankore.jpeg',
     '/images/Ankore1.jpeg',
@@ -27,16 +27,17 @@ export default function Footer() {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [backgroundImages.length]);
 
   return (
-    <footer className="relative text-white overflow-hidden">
-      {/* Full-cover cycling background images with the exact blue tone from the screenshot */}
+    <footer className="relative text-white overflow-hidden bg-gray-900">
+      
+      {/* Full-cover cycling background images */}
       <div className="absolute inset-0 z-0">
         {backgroundImages.map((src, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-5000 ease-in-out ${
+            className={`absolute inset-0 transition-opacity duration-[5000ms] ease-in-out ${
               index === currentImageIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -45,206 +46,135 @@ export default function Footer() {
               alt="KAAYM Background"
               fill
               className="object-cover object-center"
-              style={{
-                objectPosition: 'center 30%', // Ensures heads are fully visible
-              }}
+              style={{ objectPosition: 'center 30%' }}
               priority={index === 0}
             />
-            {/* Deep blue overlay matching the screenshot's vibrant blue lighting */}
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-950/70 via-blue-900/60 to-blue-950/80" />
+            {/* Intense black gradient overlay fading from Right to Left */}
+            <div className="absolute inset-0 bg-gradient-to-l from-black/95 via-black/70 to-transparent" />
           </div>
         ))}
       </div>
 
-      {/* Main Footer Content – Your original words and layout preserved */}
+      {/* Main Footer Content */}
       <div className="relative z-10 container mx-auto px-4 py-16">
+        {/* Reordered grid layout to place brand section on the far left */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand & Location Section – Larger badge */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-6">
-              <div className="w-32 h-32 bg-amber-500 rounded-2xl flex items-center justify-center shadow-2xl">
+          
+          {/* Brand & Expanded Badge Section (moved back to the far left) */}
+          <div className="space-y-8">
+            <div className="flex flex-col gap-6">
+              {/* Circular Logo Boundary */}
+              <div className="w-48 h-48 bg-amber-500 rounded-full flex items-center justify-center shadow-2xl overflow-hidden border-4 border-amber-400">
                 {imageError ? (
-                  <span className="text-blue-950 font-black text-4xl tracking-wider">
-                    KAAYM
-                  </span>
+                  <span className="text-gray-900 font-black text-4xl">KAAYM</span>
                 ) : (
                   <Image
                     src="/images/kaaym_badge.jpg"
                     alt="KAAYM Badge"
-                    width={128}
-                    height={128}
-                    className="rounded-2xl object-cover"
+                    width={200}
+                    height={200}
+                    className="object-cover w-full h-full"
                     onError={() => setImageError(true)}
                   />
                 )}
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-amber-400">{siteConfig.name}</h3>
-                <p className="text-amber-300 text-base">Kigezi Ankole Anglican Youth Missioners</p>
+                <h3 className="text-3xl font-bold text-amber-400 leading-tight">{siteConfig.name}</h3>
+                <p className="text-amber-200 text-lg italic">Kigezi Ankole Anglican Youth Missioners</p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <p className="text-2xl font-bold text-white">
-                {siteConfig.baseLocation}
-              </p>
-              <p className="text-lg text-amber-200">
-                St. Francis Chapel, Makerere University
-              </p>
+              <p className="text-xl font-bold text-white">{siteConfig.baseLocation}</p>
+              <p className="text-gray-300">St. Francis Chapel, Makerere University</p>
               <a
                 href={`mailto:${siteConfig.socialLinks.email}`}
-                className="block text-amber-300 hover:text-amber-200 transition text-lg mt-4"
+                className="inline-flex items-center gap-2 text-amber-300 hover:text-amber-200 transition mt-2"
               >
-                {siteConfig.socialLinks.email}
+                <Mail size={20} /> {siteConfig.socialLinks.email}
               </a>
             </div>
 
             <Link
               href="/donate"
-              className="inline-block bg-amber-500 hover:bg-amber-400 text-blue-950 font-bold px-8 py-3 rounded-md transition shadow-lg text-lg"
+              className="inline-block bg-amber-500 hover:bg-amber-400 text-gray-900 font-black px-10 py-4 rounded-xl transition shadow-xl uppercase tracking-wider"
             >
               JOIN US NOW
             </Link>
           </div>
 
-          {/* About Column */}
+          {/* Navigation Columns */}
           <div>
-            <h4 className="text-xl font-bold text-amber-400 mb-6">About</h4>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/about/leadership" className="text-gray-300 hover:text-white transition">
-                  Leadership
-                </Link>
-              </li>
-              <li>
-                <Link href="/about/values" className="text-gray-300 hover:text-white transition">
-                  Growing together
-                </Link>
-              </li>
-              <li>
-                <Link href="/about/beliefs" className="text-gray-300 hover:text-white transition">
-                  Fellowships
-                </Link>
-              </li>
+            <h4 className="text-xl font-bold text-amber-400 mb-6 border-b border-amber-500/30 pb-2">About</h4>
+            <ul className="space-y-4 text-gray-200">
+              <li><Link href="/about/leadership" className="hover:text-amber-300 transition">Leadership</Link></li>
+              <li><Link href="/about/values" className="hover:text-amber-300 transition">Growing together</Link></li>
+              <li><Link href="/about/fellowships" className="hover:text-amber-300 transition">Fellowships</Link></li>
             </ul>
 
-            <h4 className="text-xl font-bold text-amber-400 mt-10 mb-6">Next Steps</h4>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/next-steps/lunch" className="text-gray-300 hover:text-white transition">
-                  External Activities
-                </Link>
-              </li>
-              <li>
-                <Link href="/next-steps/baptism" className="text-gray-300 hover:text-white transition">
-                  Internal activities
-                </Link>
-              </li>
-              <li>
-                <Link href="/next-steps/volunteer" className="text-gray-300 hover:text-white transition">
-                  Volunteering in StFrancis Chapel
-                </Link>
-              </li>
+            <h4 className="text-xl font-bold text-amber-400 mt-12 mb-6 border-b border-amber-500/30 pb-2">Next Steps</h4>
+            <ul className="space-y-4 text-gray-200">
+              <li><Link href="/activities/external" className="hover:text-amber-300 transition">External Activities</Link></li>
+              <li><Link href="/activities/internal" className="hover:text-amber-300 transition">Internal activities</Link></li>
+              <li><Link href="/volunteer" className="hover:text-amber-300 transition">Volunteering at St. Francis</Link></li>
             </ul>
           </div>
 
-          {/* Ministries Column */}
+          {/* Departments */}
           <div>
-            <h4 className="text-xl font-bold text-amber-400 mb-6">Ministries</h4>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/ministries/kids" className="text-gray-300 hover:text-white transition">
-                  KAAYM Chairperson-seat
-                </Link>
-              </li>
-              <li>
-                <Link href="/ministries/youth" className="text-gray-300 hover:text-white transition">
-                  Care Groups
-                </Link>
-              </li>
-              <li>
-                <Link href="/ministries/storytellers" className="text-gray-300 hover:text-white transition">
-                  Doices
-                </Link>
-              </li>
-              <li>
-                <Link href="/ministries/college" className="text-gray-300 hover:text-white transition">
-                  Prayer seat
-                </Link>
-              </li>
-              <li>
-                <Link href="/ministries/equip" className="text-gray-300 hover:text-white transition">
-                  Missions-Desk
-                </Link>
-              </li>
-              <li>
-                <Link href="/ministries/communities" className="text-gray-300 hover:text-white transition">
-                  Publicity-Desk
-                </Link>
-              </li>
+            <h4 className="text-xl font-bold text-amber-400 mb-6 border-b border-amber-500/30 pb-2">Departments</h4>
+            <ul className="space-y-4 text-gray-200">
+              <li><Link href="/dept/chairperson" className="hover:text-amber-300 transition">KAAYM Chairperson-seat</Link></li>
+              <li><Link href="/dept/care-groups" className="hover:text-amber-300 transition">Care Groups</Link></li>
+              <li><Link href="/dept/dioceses" className="hover:text-amber-300 transition">Dioceses</Link></li>
+              <li><Link href="/dept/prayer" className="hover:text-amber-300 transition">Prayer seat</Link></li>
+              <li><Link href="/dept/missions" className="hover:text-amber-300 transition">Missions-Desk</Link></li>
+              <li><Link href="/dept/publicity" className="hover:text-amber-300 transition">Publicity-Desk</Link></li>
             </ul>
           </div>
 
-          {/* Need Help? Column */}
+          {/* Assistance & Social */}
           <div>
-            <h4 className="text-xl font-bold text-amber-400 mb-6">Need Assistance?</h4>
-            <ul className="space-y-4">
-              <li>
-                <Link href="/help/counseling" className="text-gray-300 hover:text-white transition">
-                  Join our weekly fellowships 
-                </Link>
-              </li>
-              <li>
-                <Link href="/help/prayer" className="text-gray-300 hover:text-white transition">
-                  Prayer Request
-                </Link>
-              </li>
-              <li>
-                <Link href="/help/benevolence" className="text-gray-300 hover:text-white transition">
-                  We here to standard with you  always , talk to us 
-                </Link>
+            <h4 className="text-xl font-bold text-amber-400 mb-6 border-b border-amber-500/30 pb-2">Need Assistance?</h4>
+            <ul className="space-y-4 text-gray-200">
+              <li><Link href="/fellowships" className="hover:text-amber-300 transition">Join weekly fellowships</Link></li>
+              <li><Link href="/prayer-request" className="hover:text-amber-300 transition">Prayer Request</Link></li>
+              <li className="text-amber-100/90 italic bg-white/5 p-4 rounded-lg border-l-4 border-amber-500">
+                We are here to stand with you always, talk to us.
               </li>
             </ul>
 
             <div className="mt-12">
-              <h5 className="text-lg font-semibold text-amber-300 mb-4">Follow Us</h5>
-              <div className="flex gap-4">
-                <a
-                  href={siteConfig.socialLinks.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center hover:bg-amber-400 transition"
+              <h5 className="text-lg font-semibold text-amber-300 mb-4">Official Channel</h5>
+              <div className="flex items-center gap-4">
+                <a 
+                  href="https://www.youtube.com/@KAAYMMukChapter" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="group flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition-all shadow-lg"
                 >
-                  <Facebook className="w-6 h-6 text-blue-950" />
-                </a>
-                <a
-                  href={siteConfig.socialLinks.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center hover:bg-amber-400 transition"
-                >
-                  <Instagram className="w-6 h-6 text-blue-950" />
-                </a>
-                <a
-                  href={siteConfig.socialLinks.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center hover:bg-amber-400 transition"
-                >
-                  <Youtube className="w-6 h-6 text-blue-950" />
+                  <Youtube size={24} className="group-hover:scale-110 transition-transform" />
+                  <span>Watch on YouTube</span>
                 </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Copyright */}
-      <div className="relative z-10 border-t border-white/20 py-6">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-300 text-sm">
-            © {currentYear} {siteConfig.name}. All rights reserved.
-          </p>
+        {/* Bottom Bar: Verse, Slogan, and Copyright */}
+        <div className="mt-16 pt-8 border-t border-white/10 text-center">
+            {/* Added Verse: now large and bold, placed first */}
+            <p className="text-white font-extrabold text-lg md:text-xl mb-4">
+                "that I may know Him and the power of is resurrection, and may share His sufferings, becoming like Him in His death," — Philippians 3:10
+            </p>
+             {/* Added Slogan: now large and bold, placed second */}
+            <p className="text-amber-400 font-extrabold text-xl md:text-2xl mb-4 uppercase tracking-widest">
+                KNOW GOD AND MAKE HIM KNOWN
+            </p>
+            {/* Copyright */}
+            <p className="text-gray-400 text-sm">
+                &copy; {currentYear} {siteConfig.name}. All rights reserved.
+            </p>
         </div>
       </div>
     </footer>

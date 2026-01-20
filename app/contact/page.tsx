@@ -1,14 +1,53 @@
 // app/contact/page.tsx
 'use client';
 
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Minus, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 export default function ContactPage() {
   const phone = "256759471542";
   const email = "ivanahumuza61@gmail.com";
-
   const message = "I want to extend a helpful hand or support the mission";
-  const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  const waLink = `https://wa.me{phone}?text=${encodeURIComponent(message)}`;
+
+  // Frequently Asked Questions Data
+  const faqs = [
+    {
+      question: "What is KAAYM's mission?",
+      answer: "Our mission is to know God and make Him known, fostering spiritual growth and community among Anglican youth in the Kigezi Ankole region.",
+    },
+    {
+      question: "What are KAAYM's main activities and ministries?",
+      answer: "We are active in several areas: running weekly fellowships, broadcasting Christian ministries on TVs (especially Family Tv), organizing missions to our home dioceses in Ankore and Kigezi, and ministering around Kampala through Runyakitara services.",
+    },
+    {
+      question: "Where is the KAAYM Makerere Chapter located?",
+      answer: "The KAAYM-MUK chapter operates under St. Francis Chapel, Makerere University.",
+    },
+    {
+      question: "When did KAAYM begin?",
+      answer: "KAAYM was initially formed as Kigezi Anglican Youth Mission in 1987 by Makerere students Rev. Dr. Medard Birungyibya Yesu, Robert Ndwahura, Turyamuhika Silvanus Boni, Gideon Batumirwa, Jonathan Besigyewe, and Justus Nyagaba. Following this, people from Ankole joined in 1992, forming the Kigezi Ankole Anglican Youth Mission (KAAYM) we know today.",
+    },
+    {
+      question: "Who can join KAAYM?",
+      answer: "Membership is primarily for Anglican youth and students, especially those affiliated with Makerere University Chapel, but we welcome anyone interested in our mission and fellowships.",
+    },
+    {
+      question: "When are the weekly fellowships?",
+      answer: "Fellowships typically happen every week at St. Francis Chapel, Makerere University. Please check our weekly program section for the most current schedule.",
+    },
+    {
+      question: "How can I support the mission?",
+      answer: "We appreciate welfare in form clothings for all genders, financial help any amount to facilite our mission activities  during our missions, also  appreciate  help extended to our fellow KAAYMErs inform of any aid.",
+    },
+  ];
+
+  // State to manage expanded FAQs
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
 
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
@@ -16,7 +55,7 @@ export default function ContactPage() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/images/image.jpg')", // Replace with your edited black-and-white/red-tinted call center image
+          backgroundImage: "url('/images/image.jpg')",
         }}
       />
 
@@ -28,7 +67,7 @@ export default function ContactPage() {
         }}
       />
 
-      {/* Optional subtle pulse animation on the overlay (remove if you don't want any pulsing) */}
+      {/* Optional subtle pulse animation (keep if you like the effect) */}
       <div className="absolute inset-0 bg-red-600/5 animate-pulse-slow pointer-events-none"></div>
 
       {/* Main Content (aligned to the left like the screenshot) */}
@@ -77,6 +116,37 @@ export default function ContactPage() {
               </a>
             </div>
           </div>
+
+          {/* FAQS SECTION STARTS HERE */}
+          <div className="mt-24 pt-12 border-t-2 border-white/30">
+            <h2 
+              className="text-4xl font-bold text-white mb-8"
+              style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.7)' }}
+            >
+              Frequently Asked Questions
+            </h2>
+            
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg">
+                  <button
+                    className="flex justify-between items-center w-full p-6 text-left focus:outline-none"
+                    onClick={() => toggleFaq(index)}
+                  >
+                    <span className="text-xl font-semibold text-white">{faq.question}</span>
+                    {openFaqIndex === index ? <Minus className="w-6 h-6 text-amber-400" /> : <Plus className="w-6 h-6 text-white/70" />}
+                  </button>
+                  {openFaqIndex === index && (
+                    <div className="px-6 pb-6 pt-0 text-gray-200 text-lg">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* FAQS SECTION ENDS HERE */}
+
         </div>
       </div>
 
