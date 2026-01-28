@@ -359,7 +359,7 @@ export default function HomePage() {
               {/* Diocesan Departments */}
               <div className="bg-teal-600 text-white p-8 rounded-lg shadow-xl">
                 <h3 className="text-2xl font-bold mb-4 text-amber-300">
-                  DIOCESAN DEPARTMENTS
+                  DIOCESAN DEPARTMENT
                 </h3>
                 <div className="h-1 w-full bg-amber-300 mb-6"></div>
                 

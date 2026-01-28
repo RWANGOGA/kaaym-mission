@@ -1,10 +1,13 @@
-// app/components/Header.tsx (or wherever you have this component)
+// app/components/Header.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Mail, MapPin, Youtube, Heart, BookOpen } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, Mail, MapPin, Youtube, Heart, BookOpen, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 // ✅ ONLY YOUR SPECIFIED PAGES
 const navItems = [
@@ -25,6 +28,8 @@ const siteConfig = {
 };
 
 export default function Header() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -80,6 +85,96 @@ export default function Header() {
   if (!mounted) return null;
 
   const isActive = (href: string) => pathname === href;
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setMobileMenuOpen(false);
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Failed to logout. Please try again.');
+    }
+  };
+
+  // Render authentication buttons
+  const renderAuthButtons = (isMobile = false) => {
+    if (loading) {
+      return (
+        <div className={`${isMobile ? 'px-4 py-2' : ''} text-gray-400 text-sm`}>
+          Loading...
+        </div>
+      );
+    }
+
+    if (user) {
+      // User is logged in
+      return (
+        <div className={`flex items-center gap-3 ${isMobile ? 'flex-col items-start w-full' : ''}`}>
+          <div
+            className={`flex items-center gap-2 ${
+              isMobile
+                ? 'px-4 py-2 text-gray-300'
+                : scrolled
+                ? 'text-gray-700'
+                : 'text-white'
+            }`}
+          >
+            <User className="w-5 h-5" />
+            <span className="font-medium truncate max-w-[160px]" title={user.email || 'User'}>
+              {user.email?.split('@')[0] || 'User'}
+            </span>
+          </div>
+          <button
+            onClick={handleLogout}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+              isMobile
+                ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20 w-full'
+                : scrolled
+                ? 'text-red-600 hover:bg-red-50'
+                : 'text-red-300 hover:bg-white/10'
+            }`}
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
+      );
+    }
+
+    // User is not logged in
+    return (
+      <div className={`flex items-center gap-3 ${isMobile ? 'flex-col items-start w-full' : ''}`}>
+        <Link
+          href="/login"
+          onClick={() => setMobileMenuOpen(false)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+            isMobile
+              ? 'text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 w-full'
+              : scrolled
+              ? 'text-blue-600 hover:bg-blue-50'
+              : 'text-white hover:bg-white/10'
+          }`}
+        >
+          <LogIn className="w-5 h-5" />
+          Login
+        </Link>
+
+        <Link
+          href="/signup"
+          onClick={() => setMobileMenuOpen(false)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+            isMobile
+              ? 'bg-green-600 text-white hover:bg-green-500 w-full justify-center'
+              : 'bg-green-600 text-white hover:bg-green-500 shadow-lg hover:shadow-xl'
+          }`}
+        >
+          <UserPlus className="w-5 h-5" />
+          Sign Up
+        </Link>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -147,13 +242,13 @@ export default function Header() {
               <img
                 src="/images/kaaym_badge.jpg"
                 alt="KAAYM"
-                className="w-20 h-20 object-contain rounded-full"
+                className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-lg transition-transform hover:scale-105"
               />
               <div>
-                <h1 className={`text-4xl font-black ${scrolled ? 'text-purple-900' : 'text-white'}`}>
+                <h1 className={`text-5xl font-bold ${scrolled ? 'text-yellow-500' : 'text-yellow-400'} tracking-tight`}>
                   KAAYM
                 </h1>
-                <p className={`text-sm font-semibold ${scrolled ? 'text-gray-600' : 'text-purple-100'}`}>
+                <p className={`text-sm font-medium ${scrolled ? 'text-gray-700' : 'text-white'} mt-1 leading-relaxed`}>
                   Kigezi Ankore Anglican Youth Missioners
                 </p>
               </div>
@@ -187,6 +282,11 @@ export default function Header() {
                 <Heart className="w-5 h-5" />
                 Support Us
               </Link>
+
+              {/* Auth Buttons - Desktop */}
+              <div className="ml-4 pl-4 border-l border-gray-300">
+                {renderAuthButtons()}
+              </div>
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -261,11 +361,13 @@ export default function Header() {
                   <img
                     src="/images/kaaym_badge.jpg"
                     alt="KAAYM"
-                    className="w-14 h-14 object-contain rounded-full border-2 border-gray-600"
+                    className="w-20 h-20 object-cover rounded-full border-4 border-purple-600 shadow-xl"
                   />
                   <div>
-                    <h1 className="text-2xl font-black text-white">KAAYM</h1>
-                    <p className="text-xs font-semibold text-gray-400">
+                    <h1 className="text-2xl font-bold text-yellow-400 tracking-tight">
+                      KAAYM
+                    </h1>
+                    <p className="text-xs font-medium text-white mt-0.5 leading-relaxed">
                       Kigezi Ankore Anglican Youth Missioners
                     </p>
                   </div>
@@ -299,6 +401,12 @@ export default function Header() {
                     </Link>
                   ))}
                 </nav>
+
+                {/* Auth Section - Mobile */}
+                <div className="mt-8 pt-6 border-t border-gray-700">
+                  <p className="px-4 text-sm text-gray-400 mb-3 font-semibold">Account</p>
+                  {renderAuthButtons(true)}
+                </div>
               </div>
 
               {/* Footer Area */}

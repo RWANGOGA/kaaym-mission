@@ -1,70 +1,68 @@
-// app/events/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../../lib/firebase'; // adjust path to your firebase file (e.g. ../../lib/firebase or ../lib/firebase)
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8081';
-
-interface DownloadableFile {
-  id: number;
+interface ResourceItem {
+  id: string;
   title: string;
-  description: string;
-  file_url: string;
-}
-
-interface Announcement {
-  id: number;
-  title: string;
-  description: string;
-  image_url?: string;
-  file_url?: string;
-  downloadable_files: DownloadableFile[];
-}
-
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price?: string;
-  image_url?: string;
-  category: string;
-  downloadable_files: DownloadableFile[];
-}
-
-interface Event {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  location?: string;
-  image_url?: string;
-  announcements: Announcement[];
-  products: Product[];
-  downloadable_files: DownloadableFile[];
+  description?: string;
+  type: string;
+  imageUrls?: string[];     // multiple images
+  fileUrl?: string;         // single file (image or PDF)
+  fileName?: string;
+  createdAt?: any;
 }
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [resources, setResources] = useState<ResourceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/events/`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch events');
-        return res.json();
-      })
-      .then(data => {
-        setEvents(data);
+    const fetchResources = async () => {
+      try {
+        const q = query(
+          collection(db, 'items'),
+          where('type', '==', 'resource'),
+          where('isActive', '==', true)
+        );
+        const querySnapshot = await getDocs(q);
+        const items = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as ResourceItem[];
+        setResources(items);
+      } catch (err: any) {
+        console.error('Firestore fetch error:', err);
+        setError('Could not load announcements, flyers & posters. Check permissions or data.');
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error('Fetch error:', err);
-        setError('Could not load events. Please try again later.');
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchResources();
   }, []);
+
+  // Prepare images for the carousel (use imageUrls array or single fileUrl if it's an image)
+  const carouselImages = resources.flatMap(item => {
+    const images: { url: string; title: string }[] = [];
+
+    // Prefer imageUrls array if present
+    if (item.imageUrls && item.imageUrls.length > 0) {
+      item.imageUrls.forEach(url => {
+        images.push({ url, title: item.title });
+      });
+    }
+    // Fallback to fileUrl only if it's an image
+    else if (item.fileUrl && /\.(jpg|jpeg|png|gif|webp)$/i.test(item.fileUrl)) {
+      images.push({ url: item.fileUrl, title: item.title });
+    }
+
+    return images;
+  });
 
   if (loading) {
     return (
@@ -86,7 +84,7 @@ export default function EventsPage() {
 
   return (
     <>
-      {/* All styles are scoped here */}
+      {/* All your original styles – kept exactly as you had */}
       <style jsx global>{`
         /* Hide scrollbar for clean look */
         .overflow-hidden {
@@ -128,7 +126,7 @@ export default function EventsPage() {
       `}</style>
 
       <div className="min-h-screen bg-gray-50">
-        {/* TOP SECTION - Intro about KAAYM */}
+        {/* TOP SECTION - Intro about KAAYM – unchanged */}
         <section className="bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white py-20 px-6 text-center">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-black mb-6 drop-shadow-lg">
@@ -145,98 +143,43 @@ export default function EventsPage() {
           </div>
         </section>
 
-        {/* MIDDLE SECTION - Auto-scrolling horizontal carousel */}
+        {/* MIDDLE SECTION - Auto-scrolling horizontal carousel – now from Firestore */}
         <section className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-purple-900">
-              Latest Events, Announcements & Resources
+              Latest Announcements, Flyers & Posters
             </h2>
 
-            {events.length === 0 ? (
+            {carouselImages.length === 0 ? (
               <p className="text-center text-xl text-gray-600 py-12">
-                No events or resources available yet. Check back soon!
+                No announcements or posters available yet. Check back soon!
               </p>
             ) : (
               <div className="overflow-hidden relative">
                 <div className="flex animate-scroll-horizontal gap-8 py-6">
                   {/* Duplicate items for seamless infinite loop */}
-                  {[...events, ...events].map((event, index) => (
+                  {[...carouselImages, ...carouselImages].map((img, index) => (
                     <div
-                      key={`${event.id}-${index}`}
+                      key={`${img.title}-${index}`}
                       className="w-[320px] md:w-[380px] flex-shrink-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 event-card"
                     >
-                      {/* Image - ADDED unoptimized HERE */}
-                      {event.image_url && (
-                        <div className="relative h-56 md:h-64 bg-gray-100">
-                          <Image
-                            src={`${API_URL}${event.image_url}`}
-                            alt={event.title}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                            priority={index < 4}
-                          />
-                        </div>
-                      )}
+                      {/* Image */}
+                      <div className="relative h-56 md:h-64 bg-gray-100">
+                        <Image
+                          src={img.url}
+                          alt={img.title}
+                          fill
+                          unoptimized={true} // Required for Firebase Storage external URLs
+                          className="object-cover"
+                          priority={index < 4}
+                        />
+                      </div>
 
                       {/* Content */}
                       <div className="p-6">
                         <h3 className="text-xl md:text-2xl font-bold text-purple-900 mb-3 line-clamp-2">
-                          {event.title}
+                          {img.title}
                         </h3>
-                        
-                        <div className="flex items-center text-sm text-gray-600 mb-4">
-                          <span className="font-medium">{event.date}</span>
-                          {event.location && (
-                            <>
-                              <span className="mx-2">•</span>
-                              <span>{event.location}</span>
-                            </>
-                          )}
-                        </div>
-
-                        <p className="text-gray-700 mb-6 line-clamp-4 text-sm leading-relaxed">
-                          {event.description}
-                        </p>
-
-                        {/* Downloadable Files */}
-                        {(event.downloadable_files?.length > 0 || event.announcements?.some(a => a.file_url)) && (
-                          <div className="space-y-3">
-                            <h4 className="font-semibold text-purple-800 mb-2">Downloads:</h4>
-                            
-                            {/* Legacy announcement files */}
-                            {event.announcements?.map(ann => 
-                              ann.file_url && (
-                                <a
-                                  key={ann.id}
-                                  href={`${API_URL}${ann.file_url}`}
-                                  download
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="block bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-lg text-sm transition flex items-center justify-between"
-                                >
-                                  <span className="font-medium">{ann.title}</span>
-                                  <span className="text-xs">↓</span>
-                                </a>
-                              )
-                            )}
-
-                            {/* New downloadable files */}
-                            {event.downloadable_files?.map(file => (
-                              <a
-                                key={file.id}
-                                href={`${API_URL}${file.file_url}`}
-                                download
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="block bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-3 rounded-lg text-sm transition flex items-center justify-between"
-                              >
-                                <span className="font-medium">{file.title}</span>
-                                <span className="text-xs">↓</span>
-                              </a>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -246,7 +189,7 @@ export default function EventsPage() {
           </div>
         </section>
 
-        {/* BOTTOM SECTION - Gallery - ADDED unoptimized HERE */}
+        {/* BOTTOM SECTION - Gallery – unchanged */}
         <section className="bg-gradient-to-br from-gray-50 to-purple-50 py-16 px-6">
           <div className="max-w-6xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-purple-900 mb-8">
