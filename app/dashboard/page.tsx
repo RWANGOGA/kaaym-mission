@@ -9,6 +9,9 @@ import { db, storage } from "../../lib/firebase"; // adjust path to your firebas
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+// ← Added exactly here as requested
+console.log("Firebase API Key from env:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
+
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();

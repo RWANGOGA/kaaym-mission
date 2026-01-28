@@ -3,15 +3,15 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../lib/firebase'; // adjust path to your firebase file (e.g. ../../lib/firebase or ../lib/firebase)
+import { db } from '../../lib/firebase'; // adjust path (e.g. ../lib/firebase or ../../lib/firebase)
 
 interface ResourceItem {
   id: string;
   title: string;
   description?: string;
   type: string;
-  imageUrls?: string[];     // multiple images
-  fileUrl?: string;         // single file (image or PDF)
+  imageUrls?: string[];
+  fileUrl?: string;
   fileName?: string;
   createdAt?: any;
 }
@@ -34,10 +34,18 @@ export default function EventsPage() {
           id: doc.id,
           ...doc.data()
         })) as ResourceItem[];
+
+        // Sort by newest first (optional but nice)
+        items.sort((a, b) => {
+          const dateA = a.createdAt?.toMillis?.() || 0;
+          const dateB = b.createdAt?.toMillis?.() || 0;
+          return dateB - dateA;
+        });
+
         setResources(items);
       } catch (err: any) {
         console.error('Firestore fetch error:', err);
-        setError('Could not load announcements, flyers & posters. Check permissions or data.');
+        setError('Could not load announcements, flyers & posters. Try refreshing.');
       } finally {
         setLoading(false);
       }
@@ -46,18 +54,13 @@ export default function EventsPage() {
     fetchResources();
   }, []);
 
-  // Prepare images for the carousel (use imageUrls array or single fileUrl if it's an image)
+  // Prepare images for carousel
   const carouselImages = resources.flatMap(item => {
     const images: { url: string; title: string }[] = [];
 
-    // Prefer imageUrls array if present
     if (item.imageUrls && item.imageUrls.length > 0) {
-      item.imageUrls.forEach(url => {
-        images.push({ url, title: item.title });
-      });
-    }
-    // Fallback to fileUrl only if it's an image
-    else if (item.fileUrl && /\.(jpg|jpeg|png|gif|webp)$/i.test(item.fileUrl)) {
+      item.imageUrls.forEach(url => images.push({ url, title: item.title }));
+    } else if (item.fileUrl && /\.(jpg|jpeg|png|gif|webp)$/i.test(item.fileUrl)) {
       images.push({ url: item.fileUrl, title: item.title });
     }
 
@@ -77,56 +80,33 @@ export default function EventsPage() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl text-red-600">{error}</div>
+        <div className="text-xl text-red-600 text-center">{error}</div>
       </div>
     );
   }
 
   return (
     <>
-      {/* All your original styles – kept exactly as you had */}
+      {/* Keep all your original styles */}
       <style jsx global>{`
-        /* Hide scrollbar for clean look */
-        .overflow-hidden {
-          scrollbar-width: none; /* Firefox */
-        }
-        .overflow-hidden::-webkit-scrollbar {
-          display: none; /* Chrome, Safari */
-        }
-
-        /* Infinite smooth auto-scroll */
+        .overflow-hidden { scrollbar-width: none; }
+        .overflow-hidden::-webkit-scrollbar { display: none; }
         .animate-scroll-horizontal {
           display: flex;
-          animation: scroll-horizontal 80s linear infinite; /* Adjust time for speed */
+          animation: scroll-horizontal 80s linear infinite;
           will-change: transform;
         }
-
         @keyframes scroll-horizontal {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%); /* Half because we duplicate items */
-          }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
-
-        /* Pause on hover */
-        .animate-scroll-horizontal:hover {
-          animation-play-state: paused;
-        }
-
-        /* Card hover effect */
-        .event-card {
-          transition: all 0.3s ease;
-        }
-        .event-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
+        .animate-scroll-horizontal:hover { animation-play-state: paused; }
+        .event-card { transition: all 0.3s ease; }
+        .event-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
       `}</style>
 
       <div className="min-h-screen bg-gray-50">
-        {/* TOP SECTION - Intro about KAAYM – unchanged */}
+        {/* TOP SECTION - unchanged */}
         <section className="bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white py-20 px-6 text-center">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl font-black mb-6 drop-shadow-lg">
@@ -143,7 +123,7 @@ export default function EventsPage() {
           </div>
         </section>
 
-        {/* MIDDLE SECTION - Auto-scrolling horizontal carousel – now from Firestore */}
+        {/* MIDDLE SECTION - Carousel from Firestore */}
         <section className="py-16 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-purple-900">
@@ -157,29 +137,35 @@ export default function EventsPage() {
             ) : (
               <div className="overflow-hidden relative">
                 <div className="flex animate-scroll-horizontal gap-8 py-6">
-                  {/* Duplicate items for seamless infinite loop */}
                   {[...carouselImages, ...carouselImages].map((img, index) => (
                     <div
                       key={`${img.title}-${index}`}
                       className="w-[320px] md:w-[380px] flex-shrink-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 event-card"
                     >
-                      {/* Image */}
                       <div className="relative h-56 md:h-64 bg-gray-100">
                         <Image
                           src={img.url}
                           alt={img.title}
                           fill
-                          unoptimized={true} // Required for Firebase Storage external URLs
+                          unoptimized={true}
                           className="object-cover"
                           priority={index < 4}
                         />
                       </div>
-
-                      {/* Content */}
                       <div className="p-6">
                         <h3 className="text-xl md:text-2xl font-bold text-purple-900 mb-3 line-clamp-2">
                           {img.title}
                         </h3>
+                        {/* Optional: add description or download link if fileUrl exists */}
+                        {img.url.includes('.pdf') && (
+                          <a
+                            href={img.url}
+                            download
+                            className="mt-2 inline-block text-sm text-purple-600 hover:underline"
+                          >
+                            Download PDF
+                          </a>
+                        )}
                       </div>
                     </div>
                   ))}
