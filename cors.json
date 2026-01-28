@@ -1,6 +1,12 @@
 ﻿[
   {
-    "origin": ["http://localhost:3000", "http://127.0.0.1:3000"],
+    "origin": [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      "https://kaaym-mission.onrender.com",
+      "https://kaaym.org",
+      "https://www.kaaym.org"
+    ],
     "method": ["GET", "POST", "PUT", "OPTIONS"],
     "responseHeader": ["Content-Type", "Authorization", "Content-Length", "User-Agent"],
     "maxAgeSeconds": 3600

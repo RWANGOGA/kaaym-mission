@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx
+﻿// app/dashboard/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ import { db, storage } from "../../lib/firebase"; // adjust path to your firebas
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-// ← Added exactly here as requested
+// Added exactly here as requested
 console.log("Firebase API Key from env:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 
 export default function Dashboard() {
@@ -182,7 +182,7 @@ export default function Dashboard() {
                   onChange={() => setType("product")}
                   className="w-5 h-5 text-purple-600"
                 />
-                <span>Product (t-shirts, Bibles, umbrellas, hymnbooks, skirts, stickers, pens…)</span>
+                <span>Product (t-shirts, Bibles, umbrellas, hymnbooks, skirts, stickers, pens)</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -193,7 +193,7 @@ export default function Dashboard() {
                   onChange={() => setType("resource")}
                   className="w-5 h-5 text-purple-600"
                 />
-                <span>Resource (reports, flyers, posters, announcements, photos…)</span>
+                <span>Resource (reports, flyers, posters, announcements, photos)</span>
               </label>
             </div>
           </div>
@@ -303,7 +303,7 @@ export default function Dashboard() {
                 required
               />
               <p className="mt-1 text-xs text-gray-500">
-                Reports → PDF • Flyers/Posters → image or PDF
+                Reports  PDF  Flyers/Posters  image or PDF
               </p>
             </div>
           )}
