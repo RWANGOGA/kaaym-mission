@@ -5,9 +5,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Mail, MapPin, Youtube, Heart, BookOpen, LogIn, UserPlus, LogOut, User } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 
 // ✅ ONLY YOUR SPECIFIED PAGES
 const navItems = [
@@ -28,7 +25,6 @@ const siteConfig = {
 };
 
 export default function Header() {
-  const { user, loading } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,10 +32,36 @@ export default function Header() {
   const [verseVisible, setVerseVisible] = useState(true);
   const pathname = usePathname();
 
-  // Mount guard
+  // Simple session check (replace with proper Django auth later)
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Check if user is logged in (Django session)
+  useEffect(() => {
+    if (!mounted) return;
+
+    const checkSession = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/check-auth/', {
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user || null);
+        }
+      } catch (err) {
+        console.log('Not logged in');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
+  }, [mounted]);
 
   // Scroll logic
   useEffect(() => {
@@ -88,9 +110,19 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      setMobileMenuOpen(false);
+      const res = await fetch('http://127.0.0.1:8000/api/logout/', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        throw new Error('Logout failed');
+      }
+
+      // Clear local state and redirect
+      setUser(null);
       router.push('/');
+      setMobileMenuOpen(false);
     } catch (error) {
       console.error('Logout error:', error);
       alert('Failed to logout. Please try again.');

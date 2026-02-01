@@ -1,27 +1,17 @@
-﻿// app/dashboard/page.tsx
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from '../contexts/AuthContext';
-import { doc, getDoc } from "firebase/firestore";
-import { db, storage } from "../../lib/firebase"; // adjust path to your firebase file
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
-// Added exactly here as requested
-console.log("Firebase API Key from env:", process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
 
 export default function Dashboard() {
-  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Admin check state
+  // --- Admin & Auth states ---
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
+  // --- Form states ---
   const [type, setType] = useState<"product" | "resource">("product");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -35,34 +25,39 @@ export default function Dashboard() {
   const [formError, setFormError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Check admin role
+  // --- Check login and admin status ---
   useEffect(() => {
-    if (authLoading) return;
-
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    const checkAdmin = async () => {
+    const checkLoggedIn = async () => {
       try {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists() && userDoc.data()?.role === "admin") {
-          setIsAdmin(true);
+        const res = await fetch("http://127.0.0.1:8001/api/check-auth/", {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Not authenticated");
+
+        const data = await res.json();
+
+        if (!data.is_authenticated) {
+          router.replace("/login");
+          return;
+        }
+
+        if (!data.is_admin) {
+          setError("Access denied. Admin only.");
+          setIsAdmin(false);
         } else {
-          setError("You do not have admin access.");
+          setIsAdmin(true);
         }
       } catch (err: any) {
-        setError("Error checking permissions: " + err.message);
+        router.replace("/login");
       } finally {
         setChecking(false);
       }
     };
 
-    checkAdmin();
-  }, [user, authLoading, router]);
+    checkLoggedIn();
+  }, [router]);
 
-  // Form submit handler
+  // --- Form submission ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -70,53 +65,38 @@ export default function Dashboard() {
     setUploading(true);
 
     try {
-      let imageUrls: string[] = [];
-      let fileUrl = "";
-      let fileName = "";
-
-      // Upload images (products)
-      if (type === "product" && images && images.length > 0) {
-        for (const img of images) {
-          const imgRef = ref(storage, `items/images/${Date.now()}_${img.name}`);
-          await uploadBytes(imgRef, img);
-          const url = await getDownloadURL(imgRef);
-          imageUrls.push(url);
-        }
-      }
-
-      // Upload file (resources)
-      if (type === "resource" && file) {
-        const fileRef = ref(storage, `items/files/${Date.now()}_${file.name}`);
-        await uploadBytes(fileRef, file);
-        fileUrl = await getDownloadURL(fileRef);
-        fileName = file.name;
-      }
-
-      // Prepare data for Firestore
-      const itemData: any = {
-        title: title.trim(),
-        description: description.trim(),
-        type: type === "product" ? "product" : "resource",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        isActive: true,
-      };
+      const formData = new FormData();
+      formData.append("title", title.trim());
+      formData.append("description", description.trim());
+      formData.append("type", type);
 
       if (type === "product") {
         if (!price) throw new Error("Price is required for products");
-        itemData.price = Number(price);
-        itemData.currency = currency;
-        if (stock !== "") itemData.stock = Number(stock);
-        if (imageUrls.length > 0) itemData.imageUrls = imageUrls;
+        formData.append("price", price.toString());
+        formData.append("currency", currency);
+        if (stock !== "") formData.append("stock", stock.toString());
+
+        if (images && images.length > 0) {
+          for (const img of images) formData.append("images", img);
+        }
       } else {
         if (!file) throw new Error("File is required for resources");
-        if (!fileUrl) throw new Error("File upload failed");
-        itemData.fileUrl = fileUrl;
-        itemData.fileName = fileName;
+        formData.append("file", file);
       }
 
-      // Save to Firestore
-      await addDoc(collection(db, "items"), itemData);
+      const response = await fetch("http://127.0.0.1:8001/api/items/", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.detail || "Failed to create item");
+      }
+
+      const result = await response.json();
+      console.log("Item created:", result);
 
       setSuccess("Item successfully added!");
       // Reset form
@@ -134,17 +114,9 @@ export default function Dashboard() {
     }
   };
 
-  if (authLoading || checking) {
-    return <div className="p-8 text-center">Loading dashboard...</div>;
-  }
-
-  if (error) {
-    return <div className="p-8 text-red-600">{error}</div>;
-  }
-
-  if (!isAdmin) {
-    return <div className="p-8">Access denied. Admin only.</div>;
-  }
+  if (checking) return <div className="p-8 text-center">Checking access...</div>;
+  if (error) return <div className="p-8 text-red-600">{error}</div>;
+  if (!isAdmin) return <div className="p-8">Access denied. Admin only.</div>;
 
   return (
     <div className="p-6 md:p-10 min-h-screen bg-gray-50">
@@ -167,11 +139,9 @@ export default function Dashboard() {
         )}
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-6">
-          {/* Item Type Selector */}
+          {/* Type selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              What are you adding?
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">What are you adding?</label>
             <div className="flex flex-col sm:flex-row gap-6">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -182,7 +152,7 @@ export default function Dashboard() {
                   onChange={() => setType("product")}
                   className="w-5 h-5 text-purple-600"
                 />
-                <span>Product (t-shirts, Bibles, umbrellas, hymnbooks, skirts, stickers, pens)</span>
+                <span>Product (t-shirts, Bibles, umbrellas, hymnbooks, etc.)</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -193,7 +163,7 @@ export default function Dashboard() {
                   onChange={() => setType("resource")}
                   className="w-5 h-5 text-purple-600"
                 />
-                <span>Resource (reports, flyers, posters, announcements, photos)</span>
+                <span>Resource (reports, flyers, posters, photos)</span>
               </label>
             </div>
           </div>
@@ -208,8 +178,9 @@ export default function Dashboard() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="e.g. Kaaym Mission T-Shirt Black OR 2025 Annual Report"
+              placeholder="Item title"
               required
+              disabled={uploading}
             />
           </div>
 
@@ -224,17 +195,16 @@ export default function Dashboard() {
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="Detailed description..."
               required
+              disabled={uploading}
             />
           </div>
 
-          {/* Product-specific fields */}
+          {/* Product-specific */}
           {type === "product" && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price (UGX) <span className="text-red-500">*</span>
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price (UGX) *</label>
                   <input
                     type="number"
                     value={price}
@@ -243,13 +213,11 @@ export default function Dashboard() {
                     placeholder="35000"
                     min="0"
                     required
+                    disabled={uploading}
                   />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Stock quantity (optional)
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock (optional)</label>
                   <input
                     type="number"
                     value={stock}
@@ -257,14 +225,13 @@ export default function Dashboard() {
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                     placeholder="45"
                     min="0"
+                    disabled={uploading}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Images
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Product Images</label>
                 <input
                   type="file"
                   multiple
@@ -276,20 +243,17 @@ export default function Dashboard() {
                     file:text-sm file:font-semibold
                     file:bg-purple-50 file:text-purple-700
                     hover:file:bg-purple-100"
+                  disabled={uploading}
                 />
-                <p className="mt-1 text-xs text-gray-500">
-                  Upload 1 or more images (JPG, PNG)
-                </p>
+                <p className="mt-1 text-xs text-gray-500">Upload 1 or more images (JPG, PNG)</p>
               </div>
             </>
           )}
 
-          {/* Resource-specific fields */}
+          {/* Resource-specific */}
           {type === "resource" && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Upload File (PDF for reports, JPG/PNG/PDF for flyers/posters) <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Upload File *</label>
               <input
                 type="file"
                 accept=".pdf,image/jpeg,image/png"
@@ -301,22 +265,20 @@ export default function Dashboard() {
                   file:bg-purple-50 file:text-purple-700
                   hover:file:bg-purple-100"
                 required
+                disabled={uploading}
               />
-              <p className="mt-1 text-xs text-gray-500">
-                Reports  PDF  Flyers/Posters  image or PDF
-              </p>
+              <p className="mt-1 text-xs text-gray-500">Reports → PDF • Flyers/Posters → image or PDF</p>
             </div>
           )}
 
           <button
             type="submit"
             disabled={uploading}
-            className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-colors
-              ${uploading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-purple-700 hover:bg-purple-800"}`}
+            className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-colors ${
+              uploading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700 hover:bg-purple-800"
+            }`}
           >
-            {uploading ? "Uploading and saving..." : "Add Item to Database"}
+            {uploading ? "Uploading..." : "Add Item to Database"}
           </button>
         </form>
       </div>

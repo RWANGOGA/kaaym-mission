@@ -5,7 +5,6 @@ import './globals.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { siteConfig } from './config/site';
-import { AuthProvider } from './contexts/AuthContext';   // ← Import this (adjust path if needed)
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -46,13 +45,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} flex flex-col min-h-screen overflow-x-hidden`}>
-        <AuthProvider>                          {/* ← Wrap everything here */}
-          <Header />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-        </AuthProvider>
+        <Header />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
