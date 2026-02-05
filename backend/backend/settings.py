@@ -13,9 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-replace-this-in-production-with-environment-variable')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'   # Default False in production
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Hosts - very important for Render
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1,kaaym-backend1.onrender.com'
+).split(',')
 
 
 # Application definition
@@ -26,19 +31,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'rest_framework',
     'corsheaders',
-    
+
     # Your apps
     'core',
 ]
 
-# FIXED: CorsMiddleware moved before SessionMiddleware
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',        # Must be before SessionMiddleware
+    'corsheaders.middleware.CorsMiddleware',           # Must be high up
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -68,9 +73,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+# Database (SQLite for now – switch to PostgreSQL on Render later)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -80,39 +83,22 @@ DATABASES = {
 
 
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Africa/Kampala'  # Uganda timezone
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
+# Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -121,45 +107,49 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Session settings - IMPORTANT for authentication
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Use database-backed sessions
-SESSION_COOKIE_NAME = 'sessionid'
-SESSION_COOKIE_DOMAIN = None  # None means browser default (localhost/127.0.0.1)
-SESSION_COOKIE_PATH = '/'
-SESSION_COOKIE_SAMESITE = 'Lax'  # 'Lax' is compatible with development HTTP
-SESSION_COOKIE_SECURE = False  # Keep False for development (True for HTTPS in production)
-SESSION_COOKIE_HTTPONLY = False  # Allow JavaScript access for debugging
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
-SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request
+# ────────────────────────────────────────────────
+#               SESSION & CSRF SETTINGS
+# ────────────────────────────────────────────────
 
-# CSRF settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_PATH = '/'
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = False           # Change to True when using HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 1209600            # 2 weeks
+SESSION_SAVE_EVERY_REQUEST = True
+
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
-CSRF_COOKIE_SAMESITE = 'Lax'  # Lax for development
-CSRF_COOKIE_SECURE = False  # Keep False for development
-CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = False              # Change to True when using HTTPS
+CSRF_COOKIE_HTTPONLY = True
+
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://kaaym-mission.onrender.com',      # ← your frontend
+    'https://kaaym-backend1.onrender.com',     # self-reference sometimes needed
 ]
 
-# CORS Configuration
+
+# ────────────────────────────────────────────────
+#                   CORS SETTINGS
+# ────────────────────────────────────────────────
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://kaaym-mission.onrender.com",
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://kaaym-mission.onrender.com',      # ← critical!
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_HEADERS = True
-
-# Additional CORS headers
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -173,13 +163,18 @@ CORS_ALLOW_HEADERS = [
 ]
 
 
-# REST Framework Configuration
+# ────────────────────────────────────────────────
+#               REST FRAMEWORK
+# ────────────────────────────────────────────────
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',   # Temporary - secure this later
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        # Or use 'rest_framework.permissions.AllowAny' for public endpoints
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
