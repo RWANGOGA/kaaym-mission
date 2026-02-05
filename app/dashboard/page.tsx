@@ -3,15 +3,30 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const API_URL = 'http://localhost:8001';  // Backend API URL
+
+// Helper function to get CSRF token from cookies
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${name}=`))
+    ?.split('=')[1];
+  
+  return cookieValue || null;
+}
+
 export default function Dashboard() {
   const router = useRouter();
 
-  // --- Admin & Auth states ---
+  // Auth & role states
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // --- Form states ---
+  // Form states
   const [type, setType] = useState<"product" | "resource">("product");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -25,39 +40,64 @@ export default function Dashboard() {
   const [formError, setFormError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // --- Check login and admin status ---
+  // Check authentication & admin role
   useEffect(() => {
-    const checkLoggedIn = async () => {
+    const checkAuth = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8001/api/check-auth/", {
+        // 0. Fetch CSRF token first
+        const csrfRes = await fetch(`${API_URL}/api/csrf/`, {
+          method: "GET",
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Not authenticated");
+        console.log("CSRF token fetch status:", csrfRes.status);
 
-        const data = await res.json();
+        // 1. Check if user is logged in
+        const authRes = await fetch(`${API_URL}/api/check-auth/`, {
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
+        });
 
-        if (!data.is_authenticated) {
+        console.log("check-auth status:", authRes.status);
+
+        if (!authRes.ok) {
+          console.log("Not authenticated - redirecting to login");
           router.replace("/login");
           return;
         }
 
-        if (!data.is_admin) {
-          setError("Access denied. Admin only.");
-          setIsAdmin(false);
-        } else {
-          setIsAdmin(true);
+        const authData = await authRes.json();
+        console.log("check-auth response:", authData);
+
+        // Check if authenticated is true and user exists
+        if (!authData.authenticated || !authData.user) {
+          console.log("No user in response → redirecting to login");
+          router.replace("/login");
+          return;
         }
-      } catch (err: any) {
+
+        setIsAuthenticated(true);
+        console.log("User is logged in:", authData.user);
+
+        // 2. Check admin privileges from the user data
+        if (authData.user.is_staff) {
+          setIsAdmin(true);
+        } else {
+          setError("Access denied. Admin privileges required.");
+          setTimeout(() => router.replace("/"), 2000);
+        }
+      } catch (err) {
+        console.error("Auth check error:", err);
         router.replace("/login");
       } finally {
         setChecking(false);
       }
     };
 
-    checkLoggedIn();
+    checkAuth();
   }, [router]);
 
-  // --- Form submission ---
+  // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -77,28 +117,72 @@ export default function Dashboard() {
         if (stock !== "") formData.append("stock", stock.toString());
 
         if (images && images.length > 0) {
-          for (const img of images) formData.append("images", img);
+          // Only use the first image (since backend expects single image field)
+          formData.append("image", images[0]);
         }
       } else {
         if (!file) throw new Error("File is required for resources");
         formData.append("file", file);
       }
 
-      const response = await fetch("http://127.0.0.1:8001/api/items/", {
+      // Log form data being sent for debugging
+      console.log("📤 Sending form data to /api/items/");
+      console.log("  - Title:", title);
+      console.log("  - Type:", type);
+      console.log("  - Description:", description);
+      if (type === "product") {
+        console.log("  - Price:", price);
+        console.log("  - Currency:", currency);
+        console.log("  - Stock:", stock);
+        console.log("  - Image file:", images?.[0]?.name || "None");
+      } else {
+        console.log("  - File:", file?.name || "None");
+      }
+
+      // Get CSRF token from cookie
+      const csrfToken = getCookie('csrftoken');
+      console.log('CSRF token for item creation:', csrfToken ? 'Found ✓' : 'Missing ⚠️');
+
+      const headers: HeadersInit = {};
+      
+      // Add CSRF token to headers if available
+      if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
+      }
+
+      const response = await fetch(`${API_URL}/api/items/`, {
         method: "POST",
+        headers: headers,
         body: formData,
         credentials: "include",
       });
 
+      console.log("POST /api/items/ response status:", response.status);
+      console.log("Response headers:", response.headers);
+
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.detail || "Failed to create item");
+        const contentType = response.headers.get('content-type');
+        let errData: any = {};
+        
+        if (contentType && contentType.includes('application/json')) {
+          errData = await response.json();
+        } else {
+          const text = await response.text();
+          console.error("Response body:", text);
+          throw new Error(`HTTP ${response.status}: ${text || 'Failed to create item'}`);
+        }
+        
+        console.error("Error response:", errData);
+        throw new Error(errData.detail || JSON.stringify(errData) || "Failed to create item");
       }
 
       const result = await response.json();
-      console.log("Item created:", result);
+      console.log("✅ Item created successfully:", result);
+      console.log("✅ Item ID:", result.id);
+      console.log("✅ Item is_active:", result.is_active);
+      console.log("✅ Item will now appear in Events page");
 
-      setSuccess("Item successfully added!");
+      setSuccess("Item successfully added! It will appear in the Events page immediately.");
       // Reset form
       setTitle("");
       setDescription("");
@@ -106,18 +190,51 @@ export default function Dashboard() {
       setStock("");
       setImages(null);
       setFile(null);
+      
+      // Reset file inputs
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach((input: any) => {
+        input.value = '';
+      });
     } catch (err: any) {
       setFormError(err.message || "Failed to add item");
-      console.error(err);
+      console.error("Upload error:", err);
     } finally {
       setUploading(false);
     }
   };
 
-  if (checking) return <div className="p-8 text-center">Checking access...</div>;
-  if (error) return <div className="p-8 text-red-600">{error}</div>;
-  if (!isAdmin) return <div className="p-8">Access denied. Admin only.</div>;
+  // Loading / error / access denied states
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-xl font-medium text-purple-800 animate-pulse">
+          Checking access...
+        </div>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="text-xl text-red-600 mb-4">{error}</div>
+          <p className="text-gray-600">Redirecting to home page...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-xl text-red-600">Access denied. Admin only.</div>
+      </div>
+    );
+  }
+
+  // Main dashboard UI
   return (
     <div className="p-6 md:p-10 min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto">
@@ -127,21 +244,23 @@ export default function Dashboard() {
         <p className="text-gray-600 mb-10">Manage KAAYM products and resources</p>
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-center">
             {success}
           </div>
         )}
 
         {formError && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center">
             {formError}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6 md:p-8 space-y-6">
-          {/* Type selector */}
+          {/* Item Type Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">What are you adding?</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              What are you adding?
+            </label>
             <div className="flex flex-col sm:flex-row gap-6">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -152,7 +271,7 @@ export default function Dashboard() {
                   onChange={() => setType("product")}
                   className="w-5 h-5 text-purple-600"
                 />
-                <span>Product (t-shirts, Bibles, umbrellas, hymnbooks, etc.)</span>
+                <span>Product (t-shirts, Bibles, umbrellas, hymnbooks, skirts, stickers, pens)</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -163,7 +282,7 @@ export default function Dashboard() {
                   onChange={() => setType("resource")}
                   className="w-5 h-5 text-purple-600"
                 />
-                <span>Resource (reports, flyers, posters, photos)</span>
+                <span>Resource (reports, flyers, posters, announcements, photos)</span>
               </label>
             </div>
           </div>
@@ -178,7 +297,7 @@ export default function Dashboard() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              placeholder="Item title"
+              placeholder="e.g. Kaaym Mission T-Shirt Black OR 2025 Annual Report"
               required
               disabled={uploading}
             />
@@ -199,12 +318,14 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* Product-specific */}
+          {/* Product-specific fields */}
           {type === "product" && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price (UGX) *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Price (UGX) <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="number"
                     value={price}
@@ -216,8 +337,11 @@ export default function Dashboard() {
                     disabled={uploading}
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock (optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stock quantity (optional)
+                  </label>
                   <input
                     type="number"
                     value={stock}
@@ -231,10 +355,11 @@ export default function Dashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product Images</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Image
+                </label>
                 <input
                   type="file"
-                  multiple
                   accept="image/*"
                   onChange={(e) => setImages(e.target.files)}
                   className="block w-full text-sm text-gray-500
@@ -245,15 +370,19 @@ export default function Dashboard() {
                     hover:file:bg-purple-100"
                   disabled={uploading}
                 />
-                <p className="mt-1 text-xs text-gray-500">Upload 1 or more images (JPG, PNG)</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Upload 1 image (JPG, PNG)
+                </p>
               </div>
             </>
           )}
 
-          {/* Resource-specific */}
+          {/* Resource-specific fields */}
           {type === "resource" && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Upload File *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Upload File (PDF for reports, JPG/PNG/PDF for flyers/posters) <span className="text-red-500">*</span>
+              </label>
               <input
                 type="file"
                 accept=".pdf,image/jpeg,image/png"
@@ -267,18 +396,21 @@ export default function Dashboard() {
                 required
                 disabled={uploading}
               />
-              <p className="mt-1 text-xs text-gray-500">Reports → PDF • Flyers/Posters → image or PDF</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Reports → PDF • Flyers/Posters → image or PDF
+              </p>
             </div>
           )}
 
           <button
             type="submit"
             disabled={uploading}
-            className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-colors ${
-              uploading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700 hover:bg-purple-800"
-            }`}
+            className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-colors
+              ${uploading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-purple-700 hover:bg-purple-800"}`}
           >
-            {uploading ? "Uploading..." : "Add Item to Database"}
+            {uploading ? "Uploading and saving..." : "Add Item to Database"}
           </button>
         </form>
       </div>

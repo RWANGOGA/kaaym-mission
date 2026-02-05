@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const API_URL = 'http://127.0.0.1:8001';
+const API_URL = 'http://localhost:8001';  // Backend API URL
 
 const PDF_PLACEHOLDER = '/pdf-placeholder.png';
 const FALLBACK_IMAGE = '/images/placeholder.jpg';
@@ -31,15 +31,27 @@ const makeAbsoluteUrl = (path?: string | null) => {
 export default function EventsPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   /* =========================
      FETCH DATA
   ========================= */
   useEffect(() => {
+    console.log(`🔄 Fetching items from ${API_URL}/api/items/`);
+    
     fetch(`${API_URL}/api/items/`)
-      .then(res => res.json())
+      .then(res => {
+        console.log(`✅ Response status: ${res.status}`);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then(data => {
+        console.log(`✅ Received data:`, data);
+        
         const list = Array.isArray(data) ? data : data.results || [];
+        console.log(`📊 Total items: ${list.length}`);
 
         const prepared = list
           .filter((i: Item) => i.is_active)
@@ -68,7 +80,14 @@ export default function EventsPage() {
             };
           });
 
+        console.log(`✅ Active items prepared: ${prepared.length}`);
         setItems(prepared);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error(`❌ Error fetching items:`, error);
+        console.error(`❌ API URL: ${API_URL}/api/items/`);
+        setError(`Failed to load items: ${error.message}`);
         setLoading(false);
       });
   }, []);
@@ -77,6 +96,26 @@ export default function EventsPage() {
     return (
       <div className="h-screen flex items-center justify-center text-purple-700 text-xl">
         Loading KAAYM content...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center">
+          <div className="text-red-600 text-lg font-semibold mb-2">⚠️ Connection Error</div>
+          <div className="text-red-500">{error}</div>
+          <div className="text-gray-600 text-sm mt-4">
+            Make sure the backend is running on {API_URL}
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

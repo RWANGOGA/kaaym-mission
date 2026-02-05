@@ -268,33 +268,33 @@ export default function Header() {
 
         {/* Main Navigation */}
         <nav className="container mx-auto px-4 py-5">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-8">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-3 flex-shrink-0">
               <img
                 src="/images/kaaym_badge.jpg"
                 alt="KAAYM"
-                className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-lg transition-transform hover:scale-105"
+                className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-lg transition-transform hover:scale-105"
               />
-              <div>
-                <h1 className={`text-5xl font-bold ${scrolled ? 'text-yellow-500' : 'text-yellow-400'} tracking-tight`}>
+              <div className="hidden sm:block">
+                <h1 className={`text-2xl sm:text-3xl font-bold ${scrolled ? 'text-yellow-500' : 'text-yellow-400'} tracking-tight`}>
                   KAAYM
                 </h1>
-                <p className={`text-sm font-medium ${scrolled ? 'text-gray-700' : 'text-white'} mt-1 leading-relaxed`}>
+                <p className={`text-xs sm:text-sm font-medium ${scrolled ? 'text-gray-700' : 'text-white'} mt-0.5 leading-tight`}>
                   Kigezi Ankore Anglican Youth Missioners
                 </p>
               </div>
             </Link>
 
             {/* Desktop Menu */}
-            <div className="hidden lg:flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-1 flex-1 justify-end">
               {navItems
                 .filter(item => item.href !== '/support')
                 .map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-6 py-3 rounded-lg font-semibold transition ${
+                    className={`px-4 py-2 rounded-lg font-semibold whitespace-nowrap transition ${
                       isActive(item.href)
                         ? 'bg-purple-600 text-white'
                         : scrolled
@@ -309,14 +309,14 @@ export default function Header() {
               {/* Support Us Button */}
               <Link
                 href="/support"
-                className="ml-3 px-6 py-3 rounded-lg bg-yellow-400 text-purple-900 hover:bg-yellow-300 font-bold flex items-center gap-2 transition-colors"
+                className="px-4 py-2 rounded-lg bg-yellow-400 text-purple-900 hover:bg-yellow-300 font-bold flex items-center gap-2 transition-colors whitespace-nowrap"
               >
                 <Heart className="w-5 h-5" />
                 Support Us
               </Link>
 
               {/* Auth Buttons - Desktop */}
-              <div className="ml-4 pl-4 border-l border-gray-300">
+              <div className="ml-2 pl-4 border-l border-gray-400">
                 {renderAuthButtons()}
               </div>
             </div>
