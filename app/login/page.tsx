@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-const API_URL = 'http://localhost:8001';  // Backend API URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
 // Helper function to get CSRF token from cookies
 function getCookie(name: string): string | null {

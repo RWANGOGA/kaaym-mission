@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const API_URL = 'http://localhost:8001';  // Backend API URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
 const PDF_PLACEHOLDER = '/pdf-placeholder.png';
 const FALLBACK_IMAGE = '/images/placeholder.jpg';

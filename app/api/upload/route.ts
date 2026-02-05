@@ -6,7 +6,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     
     // Forward the upload request to Django backend
-    const response = await fetch('http://localhost:8001/api/items/', {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+    const response = await fetch(`${apiUrl}/api/items/`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
