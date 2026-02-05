@@ -110,7 +110,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/logout/', {
+      const res = await fetch('https://kaaym-backend1.onrender.com/api/logout/', {
         method: 'POST',
         credentials: 'include',
       });

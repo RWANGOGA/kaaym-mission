@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kaaym-backend1.onrender.com';
 
 // Helper function to get CSRF token from cookies
 function getCookie(name: string): string | null {
@@ -209,7 +209,7 @@ export default function LoginPage() {
           {/* Server status indicator */}
           <div className="mt-6 p-3 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-500 text-center">
-              Django server: http://localhost:8001
+              Django server: https://kaaym-backend1.onrender.com
             </p>
             {csrfToken && (
               <p className="text-xs text-green-600 text-center mt-1">
