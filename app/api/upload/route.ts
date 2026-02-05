@@ -1,29 +1,25 @@
 ﻿// app/api/upload/route.ts
 import { NextResponse, NextRequest } from 'next/server';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../../lib/firebase'; // adjust path if lib is in root (../../../lib/firebase) or app (../lib/firebase)
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const category = formData.get('category') as string;  // "images" or "files"
+    
+    // Forward the upload request to Django backend
+    const response = await fetch('http://localhost:8001/api/items/', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    if (!response.ok) {
+      throw new Error(`Backend error: ${response.statusText}`);
     }
 
-    const fileName = `${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, `items/${category}/${fileName}`);
-
-    // Upload from server (no CORS issue)
-    await uploadBytes(storageRef, await file.arrayBuffer(), { contentType: file.type });
-
-    const url = await getDownloadURL(storageRef);
-
-    return NextResponse.json({ url });
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error: any) {
-    console.error('Server upload error:', error);
+    console.error('Upload error:', error);
     return NextResponse.json({ error: error.message || 'Upload failed' }, { status: 500 });
   }
 }
