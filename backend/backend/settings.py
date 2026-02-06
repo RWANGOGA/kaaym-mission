@@ -78,14 +78,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # =============================================
-#  DATABASE (SQLite local, PostgreSQL on Render)
+#  DATABASE (SQLite only)
 # =============================================
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3' if DEBUG else 'django.db.backends.postgresql',
-        'NAME': BASE_DIR / 'db.sqlite3' if DEBUG else os.getenv('DATABASE_URL'),
-        # For PostgreSQL on Render: use DATABASE_URL env var
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
