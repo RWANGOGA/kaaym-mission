@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kaaym-backend1.onrender.com';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001';
 
 // Helper function to get CSRF token from cookies
 function getCookie(name: string): string | null {
@@ -74,7 +74,7 @@ export default function LoginPage() {
         headers: headers,
         credentials: "include",
         body: JSON.stringify({
-          email: email,
+          email: email,  // Backend accepts both 'username' and 'email'
           password: password,
         }),
       });
@@ -98,7 +98,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError('Cannot connect to server. Make sure Django is running on port 8001.');
+      setError('Cannot connect to server. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -209,7 +209,7 @@ export default function LoginPage() {
           {/* Server status indicator */}
           <div className="mt-6 p-3 bg-gray-50 rounded-lg">
             <p className="text-xs text-gray-500 text-center">
-              Django server: https://kaaym-backend1.onrender.com
+              Connected to: {API_URL}
             </p>
             {csrfToken && (
               <p className="text-xs text-green-600 text-center mt-1">

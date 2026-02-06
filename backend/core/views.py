@@ -1,8 +1,6 @@
 # core/views.py
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.middleware.csrf import get_token
 
 from rest_framework.views import APIView
@@ -82,52 +80,59 @@ def signup(request):
 
 
 # =============================================
-#  Login (CSRF exempt)
+#  Login Endpoint
 # =============================================
-@method_decorator(csrf_exempt, name='dispatch')
-class LoginView(APIView):
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def login_view(request):
     """ POST /api/login/ """
-    def post(self, request):
-        username = request.data.get("username") or request.data.get("email")
-        password = request.data.get("password")
+    username = request.data.get("username") or request.data.get("email")
+    password = request.data.get("password")
 
-        if not username or not password:
-            return Response(
-                {"detail": "Username/email and password are required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            return Response({
-                "detail": "Login successful",
-                "authenticated": True,
-                "user": {
-                    "username": user.username,
-                    "email": user.email or "",
-                    "is_staff": user.is_staff,
-                    "is_superuser": user.is_superuser
-                }
-            }, status=status.HTTP_200_OK)
-
+    if not username or not password:
         return Response(
-            {"detail": "Invalid credentials"},
-            status=status.HTTP_401_UNAUTHORIZED
+            {"detail": "Username/email and password are required"},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
+    user = authenticate(request, username=username, password=password)
 
-class LogoutView(APIView):
+    if user is not None:
+        login(request, user)
+        return Response({
+            "detail": "Login successful",
+            "authenticated": True,
+            "user": {
+                "username": user.username,
+                "email": user.email or "",
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser
+            }
+        }, status=status.HTTP_200_OK)
+
+    return Response(
+        {"detail": "Invalid credentials"},
+        status=status.HTTP_401_UNAUTHORIZED
+    )
+
+
+# =============================================
+#  Logout Endpoint
+# =============================================
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def logout_view(request):
     """ POST /api/logout/ """
-    def post(self, request):
-        logout(request)
-        return Response(
-            {"detail": "Logged out successfully"},
-            status=status.HTTP_200_OK
-        )
+    logout(request)
+    return Response(
+        {"detail": "Logged out successfully"},
+        status=status.HTTP_200_OK
+    )
 
 
+# =============================================
+#  Item List/Create Endpoint
+# =============================================
 class ItemListCreateView(generics.ListCreateAPIView):
     """ GET /api/items/   POST /api/items/ """
     queryset = Item.objects.filter(is_active=True).order_by('-created_at')
@@ -140,6 +145,9 @@ class ItemListCreateView(generics.ListCreateAPIView):
         serializer.save(user=self.request.user if self.request.user.is_authenticated else None)
 
 
+# =============================================
+#  Check Authentication Status
+# =============================================
 class CheckAuthView(APIView):
     """ GET /api/check-auth/ """
     permission_classes = [permissions.AllowAny]
@@ -162,6 +170,9 @@ class CheckAuthView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+# =============================================
+#  Check Admin Status
+# =============================================
 class CheckAdminView(APIView):
     """ GET /api/check-admin/ """
     permission_classes = [permissions.AllowAny]
