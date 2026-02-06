@@ -3,19 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kaaym-backend1.onrender.com';
-
-// Helper function to get CSRF token from cookies
-function getCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  
-  const cookieValue = document.cookie
-    .split('; ')
-    .find(row => row.startsWith(`${name}=`))
-    ?.split('=')[1];
-  
-  return cookieValue || null;
-}
+// Use environment variable for production (Render), fallback to local for development
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -44,13 +33,6 @@ export default function Dashboard() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // 0. Fetch CSRF token first
-        const csrfRes = await fetch(`${API_URL}/api/csrf/`, {
-          method: "GET",
-          credentials: "include",
-        });
-        console.log("CSRF token fetch status:", csrfRes.status);
-
         // 1. Check if user is logged in
         const authRes = await fetch(`${API_URL}/api/check-auth/`, {
           method: "GET",
@@ -79,7 +61,7 @@ export default function Dashboard() {
         setIsAuthenticated(true);
         console.log("User is logged in:", authData.user);
 
-        // 2. Check admin privileges from the user data
+        // 2. Check admin privileges
         if (authData.user.is_staff) {
           setIsAdmin(true);
         } else {
@@ -139,31 +121,18 @@ export default function Dashboard() {
         console.log("  - File:", file?.name || "None");
       }
 
-      // Get CSRF token from cookie
-      const csrfToken = getCookie('csrftoken');
-      console.log('CSRF token for item creation:', csrfToken ? 'Found ✓' : 'Missing ⚠️');
-
-      const headers: HeadersInit = {};
-      
-      // Add CSRF token to headers if available
-      if (csrfToken) {
-        headers['X-CSRFToken'] = csrfToken;
-      }
-
       const response = await fetch(`${API_URL}/api/items/`, {
         method: "POST",
-        headers: headers,
         body: formData,
         credentials: "include",
       });
 
       console.log("POST /api/items/ response status:", response.status);
-      console.log("Response headers:", response.headers);
 
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
         let errData: any = {};
-        
+
         if (contentType && contentType.includes('application/json')) {
           errData = await response.json();
         } else {
@@ -171,7 +140,7 @@ export default function Dashboard() {
           console.error("Response body:", text);
           throw new Error(`HTTP ${response.status}: ${text || 'Failed to create item'}`);
         }
-        
+
         console.error("Error response:", errData);
         throw new Error(errData.detail || JSON.stringify(errData) || "Failed to create item");
       }
@@ -190,7 +159,7 @@ export default function Dashboard() {
       setStock("");
       setImages(null);
       setFile(null);
-      
+
       // Reset file inputs
       const fileInputs = document.querySelectorAll('input[type="file"]');
       fileInputs.forEach((input: any) => {

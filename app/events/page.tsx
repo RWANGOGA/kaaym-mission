@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kaaym-backend1.onrender.com';
+// Use environment variable for production (Render), fallback to local for development
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001';
 
 const PDF_PLACEHOLDER = '/pdf-placeholder.png';
 const FALLBACK_IMAGE = '/images/placeholder.jpg';
@@ -19,11 +20,11 @@ interface Item {
 }
 
 /* =========================
-   URL FIXER
+   URL FIXER - makes relative paths absolute
 ========================= */
 const makeAbsoluteUrl = (path?: string | null) => {
   if (!path) return null;
-  if (path.startsWith('http')) return path;
+  if (path.startsWith('http') || path.startsWith('//')) return path;
   if (!path.startsWith('/')) path = '/' + path;
   return `${API_URL}${path}`;
 };
@@ -37,7 +38,7 @@ export default function EventsPage() {
      FETCH DATA
   ========================= */
   useEffect(() => {
-    console.log(`🔄 Fetching items from ${API_URL}/api/items/`);
+    console.log(`🔄 Fetching items from: ${API_URL}/api/items/`);
     
     fetch(`${API_URL}/api/items/`)
       .then(res => {
@@ -86,7 +87,7 @@ export default function EventsPage() {
       })
       .catch(error => {
         console.error(`❌ Error fetching items:`, error);
-        console.error(`❌ API URL: ${API_URL}/api/items/`);
+        console.error(`❌ Used API URL: ${API_URL}/api/items/`);
         setError(`Failed to load items: ${error.message}`);
         setLoading(false);
       });
@@ -109,7 +110,7 @@ export default function EventsPage() {
           <div className="text-gray-600 text-sm mt-4">
             Make sure the backend is running on {API_URL}
           </div>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
           >
