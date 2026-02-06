@@ -6,6 +6,18 @@ import { useRouter } from "next/navigation";
 // Use environment variable for production (Render), fallback to local for development
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001';
 
+// Helper function to get CSRF token from cookies
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  
+  const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith(`${name}=`))
+    ?.split('=')[1];
+  
+  return cookieValue || null;
+}
+
 export default function Dashboard() {
   const router = useRouter();
 
@@ -99,7 +111,6 @@ export default function Dashboard() {
         if (stock !== "") formData.append("stock", stock.toString());
 
         if (images && images.length > 0) {
-          // Only use the first image (since backend expects single image field)
           formData.append("image", images[0]);
         }
       } else {
@@ -107,22 +118,18 @@ export default function Dashboard() {
         formData.append("file", file);
       }
 
-      // Log form data being sent for debugging
       console.log("📤 Sending form data to /api/items/");
-      console.log("  - Title:", title);
-      console.log("  - Type:", type);
-      console.log("  - Description:", description);
-      if (type === "product") {
-        console.log("  - Price:", price);
-        console.log("  - Currency:", currency);
-        console.log("  - Stock:", stock);
-        console.log("  - Image file:", images?.[0]?.name || "None");
-      } else {
-        console.log("  - File:", file?.name || "None");
+
+      // Get CSRF token
+      const csrfToken = getCookie('csrftoken');
+      const headers: HeadersInit = {};
+      if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
       }
 
       const response = await fetch(`${API_URL}/api/items/`, {
         method: "POST",
+        headers: headers,
         body: formData,
         credentials: "include",
       });
@@ -147,11 +154,9 @@ export default function Dashboard() {
 
       const result = await response.json();
       console.log("✅ Item created successfully:", result);
-      console.log("✅ Item ID:", result.id);
-      console.log("✅ Item is_active:", result.is_active);
-      console.log("✅ Item will now appear in Events page");
 
       setSuccess("Item successfully added! It will appear in the Events page immediately.");
+      
       // Reset form
       setTitle("");
       setDescription("");
