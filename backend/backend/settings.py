@@ -131,15 +131,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 WHITENOISE_ADD_HEADERS = True
 WHITENOISE_ROOT = MEDIA_ROOT
 
-# Serve media files in production (DEBUG=False)
-if not DEBUG:
-    from django.urls import path
-    from django.views.static import serve
-    
-    urlpatterns = [
-        path("media/<path>", serve, {"document_root": MEDIA_ROOT}),
-    ] + urlpatterns
-
 
 # =============================================
 #  DEFAULT PRIMARY KEY
