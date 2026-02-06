@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 // Use environment variable for production (Render), fallback to local for development
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://kaaym-backend1.onrender.com';
 
 const PDF_PLACEHOLDER = '/pdf-placeholder.png';
 const FALLBACK_IMAGE = '/images/placeholder.jpg';
