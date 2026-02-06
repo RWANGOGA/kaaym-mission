@@ -127,18 +127,18 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# WhiteNoise configuration for serving media files in production
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-# WhiteNoise serves media files in production
+# WhiteNoise configuration for serving static AND media files in production
+WHITENOISE_ADD_HEADERS = True
 WHITENOISE_ROOT = MEDIA_ROOT
+
+# Serve media files in production (DEBUG=False)
+if not DEBUG:
+    from django.urls import path
+    from django.views.static import serve
+    
+    urlpatterns = [
+        path("media/<path>", serve, {"document_root": MEDIA_ROOT}),
+    ] + urlpatterns
 
 
 # =============================================
@@ -177,7 +177,7 @@ CSRF_COOKIE_HTTPONLY = False              # False so JS can read it
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://kaaym-mission.onrender.com',      # ← your frontend domain
+    'https://kaaym-mission.onrender.com',      # your frontend domain
     'https://kaaym-backend.onrender.com',      # self-reference (sometimes needed)
     'https://kaaym-backend1.onrender.com',     # legacy reference
 ]
@@ -190,7 +190,7 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://kaaym-mission.onrender.com',      # ← your actual frontend URL
+    'https://kaaym-mission.onrender.com',      # your actual frontend URL
     'https://kaaym-frontend.onrender.com',      # alternate frontend URL
     'https://kaaym-backend1.onrender.com',      # user-provided frontend URL
     'https://*.vercel.app',                     # Vercel deployments
