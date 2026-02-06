@@ -192,6 +192,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'https://kaaym-mission.onrender.com',      # ← your actual frontend URL
     'https://kaaym-frontend.onrender.com',      # alternate frontend URL
+    'https://kaaym-backend1.onrender.com',      # user-provided frontend URL
+    'https://*.vercel.app',                     # Vercel deployments
 ]
 
 CORS_ALLOW_CREDENTIALS = True
