@@ -8,6 +8,10 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env.local (development) or .env (production)
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / '.env.local')
+
 
 # =============================================
 #  SECURITY & ENVIRONMENT
@@ -16,11 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-replace-this-in-production-with-environment-variable')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'  # False in production
+# DEBUG = True  # Hardcoded for local development (media file serving)
 
 # Hosts - critical for Render
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
-    'localhost,127.0.0.1,kaaym-backend1.onrender.com'
+    'localhost,127.0.0.1,kaaym-backend.onrender.com,kaaym-backend1.onrender.com,kaaym-mission.onrender.com,.onrender.com'
 ).split(',')
 
 
@@ -47,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise for static/media files in production
     'corsheaders.middleware.CorsMiddleware',  # Must be high
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -121,6 +127,19 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# WhiteNoise configuration for serving media files in production
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# WhiteNoise serves media files in production
+WHITENOISE_ROOT = MEDIA_ROOT
+
 
 # =============================================
 #  DEFAULT PRIMARY KEY
@@ -159,7 +178,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://kaaym-mission.onrender.com',      # ← your frontend domain
-    'https://kaaym-backend1.onrender.com',      # self-reference (sometimes needed)
+    'https://kaaym-backend.onrender.com',      # self-reference (sometimes needed)
+    'https://kaaym-backend1.onrender.com',     # legacy reference
 ]
 
 
@@ -171,6 +191,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://kaaym-mission.onrender.com',      # ← your actual frontend URL
+    'https://kaaym-frontend.onrender.com',      # alternate frontend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True

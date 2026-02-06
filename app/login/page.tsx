@@ -85,14 +85,8 @@ export default function LoginPage() {
       if (res.ok) {
         console.log("Login successful:", data);
         
-        // Check if user is staff/admin
-        if (data.user && data.user.is_staff) {
-          // Redirect to dashboard for admin users
-          router.push('/dashboard');
-        } else {
-          // Redirect to home for regular users
-          router.push('/');
-        }
+        // Redirect to dashboard for all authenticated users
+        router.push('/dashboard');
       } else {
         setError(data.detail || 'Login failed. Please check your credentials.');
       }

@@ -73,12 +73,12 @@ export default function Dashboard() {
         setIsAuthenticated(true);
         console.log("User is logged in:", authData.user);
 
-        // 2. Check admin privileges
-        if (authData.user.is_staff) {
-          setIsAdmin(true);
-        } else {
-          setError("Access denied. Admin privileges required.");
-          setTimeout(() => router.replace("/"), 2000);
+        // 2. Check admin privileges (optional - remove if all users should access)
+        setIsAdmin(authData.user.is_staff);
+        
+        // For non-admin users, show a message but allow access
+        if (!authData.user.is_staff) {
+          console.log("Non-admin user accessing dashboard");
         }
       } catch (err) {
         console.error("Auth check error:", err);
@@ -200,22 +200,16 @@ export default function Dashboard() {
     );
   }
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl text-red-600">Access denied. Admin only.</div>
-      </div>
-    );
-  }
-
   // Main dashboard UI
   return (
     <div className="p-6 md:p-10 min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold text-purple-900 mb-2">
-          Admin Dashboard
+          {isAdmin ? "Admin Dashboard" : "Dashboard"}
         </h1>
-        <p className="text-gray-600 mb-10">Manage KAAYM products and resources</p>
+        <p className="text-gray-600 mb-10">
+          {isAdmin ? "Manage KAAYM products and resources" : "Welcome to your KAAYM Dashboard"}
+        </p>
 
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-center">

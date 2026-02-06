@@ -3,9 +3,9 @@ import { SiteConfig } from '../types';
 
 export const siteConfig: SiteConfig = {
   name: 'KAAYM',
-  description: 'Kigezi Ankore  Anglican Youth Missioners - St. Francis Chapel, Makerere University',
-  mission: 'Spreading the Gospel of Jesus Christ and bringing salvation to all, with a special focus on our Anglican brothers and sisters across Uganda.',
-  vision: 'To be a beacon of hope and salvation, reaching out to communities in Western Uganda and beyond, transforming lives through Christ.',
+  description: 'Kigezi Ankore Anglican Youth Missioners - St. Francis Chapel, Makerere University',
+  mission: 'Preparing the harvest for the Lord and ensure that the truth and knowledge of God is spread to all nations, institutions of learning, churches, and communities.',
+  vision: "KAAYM envisions a world where everyone lives purposefully to realize their full potential according to God's will. It envisions nations of the world transformed through godly leadership.",
   baseLocation: 'St. Francis Chapel, Makerere University, Kampala',
   jerusalemLocation: 'Western Uganda',
   socialLinks: {
