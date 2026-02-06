@@ -9,21 +9,25 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# =============================================
+#  SECURITY & ENVIRONMENT
+# =============================================
+
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-replace-this-in-production-with-environment-variable')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'   # Default False in production
+DEBUG = os.getenv('DEBUG', 'False') == 'True'  # False in production
 
-
-# Hosts - very important for Render
+# Hosts - critical for Render
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
     'localhost,127.0.0.1,kaaym-backend1.onrender.com'
 ).split(',')
 
 
-# Application definition
+# =============================================
+#  APPLICATIONS
+# =============================================
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,18 +36,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third party apps
+    # Third-party
     'rest_framework',
     'corsheaders',
 
-    # Your apps
+    # Your app
     'core',
 ]
 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',           # Must be high up
+    'corsheaders.middleware.CorsMiddleware',  # Must be high
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,16 +77,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database (SQLite for now – switch to PostgreSQL on Render later)
+# =============================================
+#  DATABASE (SQLite local, PostgreSQL on Render)
+# =============================================
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.sqlite3' if DEBUG else 'django.db.backends.postgresql',
+        'NAME': BASE_DIR / 'db.sqlite3' if DEBUG else os.getenv('DATABASE_URL'),
+        # For PostgreSQL on Render: use DATABASE_URL env var
     }
 }
 
 
-# Password validation
+# =============================================
+#  PASSWORD VALIDATION
+# =============================================
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -91,14 +102,20 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# =============================================
+#  INTERNATIONALIZATION
+# =============================================
+
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Africa/Kampala'  # Uganda timezone
+TIME_ZONE = 'Africa/Kampala'
 USE_I18N = True
 USE_TZ = True
 
 
-# Static files
+# =============================================
+#  STATIC & MEDIA FILES
+# =============================================
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -106,47 +123,55 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# Default primary key field type
+# =============================================
+#  DEFAULT PRIMARY KEY
+# =============================================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# ────────────────────────────────────────────────
-#               SESSION & CSRF SETTINGS
-# ────────────────────────────────────────────────
+# =============================================
+#  SESSION & COOKIE SETTINGS (cross-site support)
+# =============================================
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
-SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_DOMAIN = None  # Let Django handle
 SESSION_COOKIE_PATH = '/'
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SECURE = False           # Change to True when using HTTPS
+SESSION_COOKIE_SAMESITE = 'None'          # Required for cross-site cookies
+SESSION_COOKIE_SECURE = not DEBUG         # True on Render (HTTPS)
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 1209600            # 2 weeks
+SESSION_COOKIE_AGE = 1209600              # 2 weeks
 SESSION_SAVE_EVERY_REQUEST = True
+
+
+# =============================================
+#  CSRF SETTINGS (cross-site support)
+# =============================================
 
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
-CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SECURE = False              # Change to True when using HTTPS
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'None'             # Required
+CSRF_COOKIE_SECURE = not DEBUG            # True on Render
+CSRF_COOKIE_HTTPONLY = False              # False so JS can read it
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'http://localhost:3001',
-    'https://kaaym-mission.onrender.com',      # ← your frontend
-    'https://kaaym-backend1.onrender.com',     # self-reference sometimes needed
+    'http://127.0.0.1:3000',
+    'https://kaaym-mission.onrender.com',      # ← your frontend domain
+    'https://kaaym-backend1.onrender.com',      # self-reference (sometimes needed)
 ]
 
 
-# ────────────────────────────────────────────────
-#                   CORS SETTINGS
-# ────────────────────────────────────────────────
+# =============================================
+#  CORS SETTINGS (allow frontend to talk to backend)
+# =============================================
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://localhost:3001',
-    'https://kaaym-mission.onrender.com',      # ← critical!
+    'http://127.0.0.1:3000',
+    'https://kaaym-mission.onrender.com',      # ← your actual frontend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -163,9 +188,9 @@ CORS_ALLOW_HEADERS = [
 ]
 
 
-# ────────────────────────────────────────────────
-#               REST FRAMEWORK
-# ────────────────────────────────────────────────
+# =============================================
+#  REST FRAMEWORK SETTINGS
+# =============================================
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -174,7 +199,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        # Or use 'rest_framework.permissions.AllowAny' for public endpoints
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
