@@ -230,9 +230,9 @@ export default function Header() {
             : 'bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900'
         }`}
       >
-        {/* Top Bar */}
+        {/* Top Bar - Hidden on mobile */}
         {!scrolled && (
-          <div className="bg-purple-800 text-white py-2.5">
+          <div className="bg-purple-800 text-white py-2.5 hidden sm:block">
             <div className="container mx-auto px-4">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-6 text-sm">
                 <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
@@ -274,7 +274,7 @@ export default function Header() {
               <img
                 src="/images/kaaym_badge.jpg"
                 alt="KAAYM"
-                className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-lg transition-transform hover:scale-105"
+                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-full border-2 sm:border-4 border-white shadow-lg transition-transform hover:scale-105"
               />
               <div className="hidden sm:block">
                 <h1 className={`text-2xl sm:text-3xl font-bold ${scrolled ? 'text-yellow-500' : 'text-yellow-400'} tracking-tight`}>
@@ -393,7 +393,7 @@ export default function Header() {
                   <img
                     src="/images/kaaym_badge.jpg"
                     alt="KAAYM"
-                    className="w-20 h-20 object-cover rounded-full border-4 border-purple-600 shadow-xl"
+                    className="w-16 h-16 object-cover rounded-full border-2 border-purple-600 shadow-xl"
                   />
                   <div>
                     <h1 className="text-2xl font-bold text-yellow-400 tracking-tight">

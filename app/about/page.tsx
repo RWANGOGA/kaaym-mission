@@ -143,33 +143,33 @@ export default function AboutPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-2xl">
               Welcome to<br />
               KAAYM
             </h1>
 
-            <p className="text-2xl md:text-3xl text-white/95 mb-8 font-light drop-shadow-lg">
+            <p className="text-lg sm:text-xl md:text-2xl text-white/95 mb-8 font-light drop-shadow-lg px-2">
               Kigezi Ankore Anglican Youth Missioners
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10 px-4">
               <Link
                 href="/contact"
-                className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl"
+                className="bg-white text-orange-600 px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-bold hover:bg-gray-100 transition shadow-xl w-full sm:w-auto"
               >
                 Be part of us 
               </Link>
               <Link
                 href="/ministries"
-                className="bg-white text-orange-600 px-10 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition shadow-xl"
+                className="bg-white text-orange-600 px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-bold hover:bg-gray-100 transition shadow-xl w-full sm:w-auto"
               >
                 Fellowship with us 
               </Link>
             </div>
 
-            <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-xl px-8 py-4 rounded-full border border-white/40">
-              <MapPin className="w-6 h-6 text-white" />
-              <span className="text-lg text-white font-medium">St. Francis Chapel, Makerere University</span>
+            <div className="inline-flex items-center gap-2 sm:gap-3 bg-white/20 backdrop-blur-xl px-4 sm:px-6 py-3 rounded-full border border-white/40 mx-2">
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <span className="text-sm sm:text-base text-white font-medium">St. Francis Chapel, Makerere University</span>
             </div>
           </div>
         </div>

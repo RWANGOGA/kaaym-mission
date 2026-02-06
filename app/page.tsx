@@ -52,43 +52,39 @@ export default function HomePage() {
         {/* Hero Content */}
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className="max-w-5xl mx-auto">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-tight mb-8 text-white drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black leading-tight mb-6 text-white drop-shadow-2xl">
               Welcome to <br />
               <span className="text-amber-300 drop-shadow-2xl">{siteConfig.name}</span>
             </h1>
 
-            <p className="text-xl md:text-2xl lg:text-3xl font-light text-white mb-10 max-w-4xl mx-auto drop-shadow-lg">
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-white mb-8 max-w-4xl mx-auto drop-shadow-lg px-2">
               {siteConfig.description}
             </p>
 
-            <p className="text-lg md:text-xl text-white mb-12 max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
+            <p className="text-base sm:text-lg md:text-xl text-white mb-10 max-w-3xl mx-auto leading-relaxed drop-shadow-lg px-2">
               Spreading the <span className="font-bold text-amber-300">Gospel</span> of Jesus Christ 
               across Western Uganda and beyond — transforming lives through faith, fellowship, and mission.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 px-4">
               <Link
                 href="/about"
-                className="bg-amber-400 text-orange-900 px-10 py-5 rounded-full text-xl font-bold hover:bg-amber-300 transition shadow-2xl flex items-center justify-center gap-3"
+                className="bg-amber-400 text-orange-900 px-8 py-4 rounded-full text-lg font-bold hover:bg-amber-300 transition shadow-2xl flex items-center justify-center gap-2"
               >
                 Learn More About Us
-                <ArrowRight className="w-6 h-6" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="/events"
-                className="border-4 border-amber-300 text-amber-300 px-10 py-5 rounded-full text-xl font-bold hover:bg-amber-300/20 transition backdrop-blur-sm"
+                className="border-4 border-amber-300 text-amber-300 px-8 py-4 rounded-full text-lg font-bold hover:bg-amber-300/20 transition backdrop-blur-sm flex items-center justify-center"
               >
                 Upcoming Events
               </Link>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-10 text-amber-200 text-lg">
-              <Link href="/locations" className="hover:text-white transition">
-                Find Our Location
-              </Link>
-              <Link href="/ministries" className="hover:text-white transition">
-                Explore Ministries
-              </Link>
+            <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-10 text-amber-200 text-base px-2">
+              <Link href="/locations" className="hover:text-white transition">Find Our Location</Link>
+              <Link href="/ministries" className="hover:text-white transition">Explore Ministries</Link>
             </div>
           </div>
         </div>
@@ -154,7 +150,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto px-2">
             {/* Rectangle */}
             <div className="animate-fade-cycle-1">
               <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 shadow-2xl text-white min-h-[280px] flex flex-col justify-center">

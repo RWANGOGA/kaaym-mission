@@ -56,15 +56,15 @@ export default function Footer() {
       </div>
 
       {/* Main Footer Content */}
-      <div className="relative z-10 container mx-auto px-4 py-16">
+      <div className="relative z-10 container mx-auto px-4 py-8 sm:py-12 md:py-16">
         {/* Reordered grid layout to place brand section on the far left */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Brand & Expanded Badge Section (moved back to the far left) */}
-          <div className="space-y-8">
-            <div className="flex flex-col gap-6">
+          <div className="space-y-6 sm:col-span-2 lg:col-span-1">
+            <div className="flex flex-col gap-4 sm:gap-6">
               {/* Circular Logo Boundary */}
-              <div className="w-48 h-48 bg-amber-500 rounded-full flex items-center justify-center shadow-2xl overflow-hidden border-4 border-amber-400">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-amber-500 rounded-full flex items-center justify-center shadow-2xl overflow-hidden border-4 border-amber-400 mx-auto sm:mx-0">
                 {imageError ? (
                   <span className="text-gray-900 font-black text-4xl">KAAYM</span>
                 ) : (
@@ -162,13 +162,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar: Verse, Slogan, and Copyright */}
-        <div className="mt-16 pt-8 border-t border-white/10 text-center">
+        <div className="mt-12 pt-6 border-t border-white/10 text-center">
             {/* Added Verse: now large and bold, placed first */}
-            <p className="text-white font-extrabold text-lg md:text-xl mb-4">
+            <p className="text-white font-extrabold text-sm sm:text-base mb-3 px-2">
                 "that I may know Him and the power of is resurrection, and may share His sufferings, becoming like Him in His death," — Philippians 3:10
             </p>
              {/* Added Slogan: now large and bold, placed second */}
-            <p className="text-amber-400 font-extrabold text-xl md:text-2xl mb-4 uppercase tracking-widest">
+            <p className="text-amber-400 font-extrabold text-lg sm:text-xl mb-3 uppercase tracking-wider px-2">
                 KNOW GOD AND MAKE HIM KNOWN
             </p>
             {/* Copyright */}

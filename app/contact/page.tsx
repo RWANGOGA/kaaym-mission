@@ -71,11 +71,11 @@ export default function ContactPage() {
       <div className="absolute inset-0 bg-red-600/5 animate-pulse-slow pointer-events-none"></div>
 
       {/* Main Content (aligned to the left like the screenshot) */}
-      <div className="relative z-10 container mx-auto px-6 py-20">
+      <div className="relative z-10 container mx-auto px-4 py-12 sm:py-16 md:py-20">
         <div className="max-w-4xl">
           {/* Main Heading */}
           <h1 
-            className="text-5xl md:text-7xl font-bold text-white mb-12 leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight"
             style={{ textShadow: '2px 4px 8px rgba(0,0,0,0.5)' }}
           >
             We're here for you!
@@ -83,10 +83,10 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div 
-            className="text-xl md:text-2xl text-white leading-relaxed"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-white leading-relaxed px-2 sm:px-0"
             style={{ textShadow: '1px 2px 6px rgba(0,0,0,0.5)' }}
           >
-            <p className="mb-8">
+            <p className="mb-6 sm:mb-8">
               If you would like to talk to us, please call us at{' '}
               <a 
                 href={`tel:+${phone}`}
@@ -104,40 +104,40 @@ export default function ContactPage() {
             </p>
 
             {/* WhatsApp Button */}
-            <div className="mt-12">
+            <div className="mt-8 sm:mt-10">
               <a
                 href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-4 bg-green-600 hover:bg-green-500 text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl transition-all transform hover:scale-105"
+                className="inline-flex items-center gap-3 sm:gap-4 bg-green-600 hover:bg-green-500 text-white px-6 sm:px-8 py-4 sm:py-5 rounded-full font-bold text-base sm:text-lg shadow-2xl transition-all transform hover:scale-105"
               >
-                <MessageCircle className="w-8 h-8" strokeWidth={2} />
+                <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8" strokeWidth={2} />
                 <span>Contact us on WhatsApp</span>
               </a>
             </div>
           </div>
 
           {/* FAQS SECTION STARTS HERE */}
-          <div className="mt-24 pt-12 border-t-2 border-white/30">
+          <div className="mt-16 sm:mt-20 pt-8 sm:pt-12 border-t-2 border-white/30 px-2 sm:px-0">
             <h2 
-              className="text-4xl font-bold text-white mb-8"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6 sm:mb-8"
               style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.7)' }}
             >
               Frequently Asked Questions
             </h2>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {faqs.map((faq, index) => (
                 <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg shadow-lg">
                   <button
-                    className="flex justify-between items-center w-full p-6 text-left focus:outline-none"
+                    className="flex justify-between items-center w-full p-4 sm:p-6 text-left focus:outline-none"
                     onClick={() => toggleFaq(index)}
                   >
-                    <span className="text-xl font-semibold text-white">{faq.question}</span>
-                    {openFaqIndex === index ? <Minus className="w-6 h-6 text-amber-400" /> : <Plus className="w-6 h-6 text-white/70" />}
+                    <span className="text-base sm:text-lg font-semibold text-white pr-2">{faq.question}</span>
+                    {openFaqIndex === index ? <Minus className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 flex-shrink-0" /> : <Plus className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 flex-shrink-0" />}
                   </button>
                   {openFaqIndex === index && (
-                    <div className="px-6 pb-6 pt-0 text-gray-200 text-lg">
+                    <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-0 text-gray-200 text-sm sm:text-base">
                       {faq.answer}
                     </div>
                   )}
